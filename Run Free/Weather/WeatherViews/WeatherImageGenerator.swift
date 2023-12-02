@@ -34,7 +34,7 @@ final class WeatherImageGenerator {
             break
         }
         return PrecipitationOptions(
-            weatherIcon: Image(systemName: prefix + base),
+            weatherIcon: base.contains("custom") ? Image(prefix + base) : Image(systemName: prefix + base),
             colors: WeatherIconColor(prefix: prefix, base: base))
     }
     

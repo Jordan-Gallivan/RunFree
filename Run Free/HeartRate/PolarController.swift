@@ -13,10 +13,12 @@ class PolarController: ObservableObject {
                                                                             PolarBleSdkFeature.feature_polar_sdk_mode,
                                                                             PolarBleSdkFeature.feature_battery_info,
                                                                             PolarBleSdkFeature.feature_device_info,])
-    // TODO: update with auto connect
+
     private static var deviceId = "9AD13824"
     
     private var currentHr: Int? = nil
+    var hrSteaming: Bool = true
+    private var hrSteamDisposable: Disposable?
 
     var hr: String {
         if let currentHr {
@@ -38,7 +40,7 @@ class PolarController: ObservableObject {
     
     @Published var batteryStatusFeature: BatteryStatusFeature = BatteryStatusFeature()
     
-    private var autoConnectDisposable: Disposable?  // TODO: determine if necessary
+    private var autoConnectDisposable: Disposable?
     
     private var searchDevicesTask: Task<Void, Never>? = nil
     
@@ -90,7 +92,6 @@ class PolarController: ObservableObject {
             .subscribe{ e in
                 switch e {
                 case .completed:
-                    
                     NSLog("auto connect search complete")
                 case .error(let err):
                     NSLog("auto connect failed: \(err)")
@@ -199,7 +200,8 @@ class PolarController: ObservableObject {
     
     func hrStreamStart() {
         if case .connected(let deviceId) = deviceConnectionState {
-            api.startHrStreaming(deviceId)
+            self.hrSteaming = true
+            self.hrSteamDisposable = api.startHrStreaming(deviceId)
                 .subscribe { e in
                     switch e {
                     case .next(let data):
@@ -213,8 +215,14 @@ class PolarController: ObservableObject {
                     }
                 }
         } else {
+            self.hrSteaming = false
             NSLog("Device not connected. \(deviceConnectionState)")
         }
+    }
+    
+    func hrStreamStop() {
+        self.hrSteaming = false
+        self.hrSteamDisposable?.dispose()
     }
 }
 
@@ -246,12 +254,14 @@ extension PolarController : PolarBleApiObserver {
         NSLog("DEVICE CONNECTED: \(polarDeviceInfo)")
         Task { @MainActor in
             self.deviceConnectionState = DeviceConnectionState.connected(polarDeviceInfo.deviceId)
+            self.hrStreamStart()
         }
     }
     
     func deviceDisconnected(_ polarDeviceInfo: PolarDeviceInfo, pairingError: Bool) {
         NSLog("DISCONNECTED: \(polarDeviceInfo)")
         Task { @MainActor in
+            self.hrStreamStop()
             self.deviceConnectionState = DeviceConnectionState.disconnected(polarDeviceInfo.deviceId)
             self.sdkModeFeature = SdkModeFeature()
             self.deviceInfoFeature = DeviceInfoFeature()

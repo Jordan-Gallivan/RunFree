@@ -12,7 +12,7 @@ struct BatteryStatusFeature {
             if newValue >= 0 && newValue <= 100 {
                 _batteryLevel = newValue
             } else {
-                print("Invalid battery level \(newValue). Battery level must be between 0 and 100.")
+                NSLog("Invalid battery level \(newValue). Battery level must be between 0 and 100.")
             }
         }
     }

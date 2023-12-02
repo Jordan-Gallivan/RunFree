@@ -124,7 +124,7 @@ class Taf {
         let calendarDate = Calendar.current.dateComponents([.day, .year, .month], from: currentDateTime)
         
         guard let currentDay = calendarDate.day, let currentMonth = calendarDate.month, let currentYear = calendarDate.year else {
-            print("ERROR parsing current date")
+            NSLog("ERROR parsing current date")
             return false
         }
         
@@ -135,7 +135,7 @@ class Taf {
         let endDay = Int(endDateTimeString[endDateTimeString.startIndex..<endDateTimeString.index(endDateTimeString.startIndex, offsetBy: 2)])
         let endTime = endDateTimeString[endDateTimeString.index(endDateTimeString.startIndex, offsetBy: 2)..<endDateTimeString.endIndex]
         guard let startDay, let endDay else {
-            print("ERROR PARSING DAYS")
+            NSLog("ERROR PARSING DAYS")
             return false
         }
         
@@ -187,7 +187,7 @@ class Taf {
         dateTimeFormat.dateFormat = "ddMMyyyyHH"
         
         guard let startDateTime = dateTimeFormat.date(from: start), let endDateTime = dateTimeFormat.date(from: end) else {
-            print("ERROR Converting to dateTime from string")
+            NSLog("ERROR Converting to dateTime from string")
             return false
         }
                 
@@ -292,8 +292,11 @@ class Taf {
         // if forecast is on an interval (has an end time/date)
         if let endDate, let endTime {
             // index into array until forecasts[i].date == startDate and forecasts[i].time >= startTime
-            while i < forecasts.count && (forecasts[i].date != startDate || forecasts[i].time < startTime) {
+            while i < forecasts.count 
+                    && ((forecasts[i].date != startDate || forecasts[i].time < startTime) || (startDate == 1 && forecasts[i].date >= 28)) {
+
                 i += 1
+                // TODO: Fix while conditional for end of the month...
             }
             guard i < forecasts.count else {
                 return
@@ -313,8 +316,11 @@ class Taf {
         // forecast is from or becoming
         } else {
             // index into array until start date/time is before or equal to forecasts[i]
-            while i < forecasts.count && (forecasts[i].date < startDate || forecasts[i].time < startTime) {
+            while i < forecasts.count
+                    && ((forecasts[i].date != startDate || forecasts[i].time < startTime) || (startDate == 1 && forecasts[i].date >= 28)) {
+
                 i += 1
+                // TODO: Fix while conditional for end of the month...
             }
             
             // vefify start date/time within the array
@@ -341,7 +347,7 @@ class Taf {
         // update forecasts
         for k in startIndex..<endIndex {
             // only update if forecast line is NOT a sunrise/sunset time
-            if !forecasts[k].sunrise && !forecasts[k].sunset{
+            if !forecasts[k].sunrise && !forecasts[k].sunset {
                 forecasts[k].windDirection = windDirection ?? forecasts[k].windDirection
                 forecasts[k].windSpeed = windSpeed ?? forecasts[k].windSpeed
                 forecasts[k].precipitation = precipitation ?? forecasts[k].precipitation

@@ -46,6 +46,32 @@ class AppData: NSObject, ObservableObject, CLLocationManagerDelegate {
             return nil
         }
     }
+    func areHrZonesValid() -> (Bool, String) {
+        guard let zone1, let zone2, let zone3, let zone4, let zone5 else {
+            return (false, "Heart Rate Zones must be greater than 0")
+        }
+        if !(zone1 != 0 && zone2 != 0 && zone3 != 0 && zone4 != 0 && zone5 != 0) {
+            return (false, "Heart Rate Zones must be greater than 0")
+        }
+        if zone1 < zone2 && zone2 < zone3 && zone3 < zone4 && zone4 < zone5 {
+            return (true, "")
+        }
+        var errorMessage = ""
+        if zone1 >= zone2 {
+            errorMessage.append("Zone 1 must be less than Zone 2. \n")
+        }
+        if zone2 >= zone3 {
+            errorMessage.append("Zone 2 must be less than Zone 3. \n")
+        }
+        if zone3 >= zone4 {
+            errorMessage.append("Zone 3 must be less than Zone 4. \n")
+        }
+        if zone4 >= zone5 {
+            errorMessage.append("Zone 4 must be less than Zone 5. \n")
+        }
+        
+        return (false, errorMessage)
+    }
     
     /** Run View Components */
     @Published var timerActive: Bool = false
@@ -81,6 +107,7 @@ class AppData: NSObject, ObservableObject, CLLocationManagerDelegate {
         self.timerPaused = false
         self.timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { (t) in
             
+            
             self.elapsedTime += 100
             self.currentTimeFormat.updateTimeFormat(elapsedTime: self.elapsedTime)
 
@@ -91,7 +118,7 @@ class AppData: NSObject, ObservableObject, CLLocationManagerDelegate {
                 self.currentLocation = self.manager.location    // TODO: handle error in fetching userlocaiton
                 guard let currLoc = self.currentLocation, let prevLoc = self.prevLocation else {
                     // TODO: error handling
-                    print("error with distances")
+                    NSLog("Invalid distance calculation.  \(Date())")
                     return
                 }
                 let deltaDistance = currLoc.distance(from: prevLoc)
@@ -146,7 +173,7 @@ class AppData: NSObject, ObservableObject, CLLocationManagerDelegate {
     }
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         // TODO: update error handling
-        print("error retrieving locaiton")
+        NSLog("error retrieving locaiton")
     }
     func checkStatus() {
         if manager.authorizationStatus == .authorizedWhenInUse {

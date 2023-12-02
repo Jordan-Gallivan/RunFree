@@ -8,7 +8,7 @@
 import Foundation
 import SwiftUI
 
-struct Distance: View {
+struct DistanceView: View {
     @EnvironmentObject private var appData: AppData
 
     var body: some View {

@@ -51,7 +51,7 @@ class StationParser: NSObject, XMLParserDelegate {
         }
         currentStation?.calcDistanceToUser(userLatitude: userLatitude, userLongitude: userLongitude)
         if currentStation?.distanceToUser == 0 {
-            print("INVALID USER DISTANCE")
+            NSLog("INVALID USER DISTANCE")
         }
         
         stations?.add(currentStation)

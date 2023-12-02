@@ -28,13 +28,13 @@ struct RunViewItem: View, Identifiable, Hashable {
         HStack {
             switch runViewType {
             case .timer:
-                RunningTimer()
+                RunningTimerView()
             case .distance:
-                Distance()
+                DistanceView()
             case .pace:
-                Pace()
+                PaceView()
             case .heartRate:
-                HeartRate()
+                HeartRateView()
             }
         }
     }

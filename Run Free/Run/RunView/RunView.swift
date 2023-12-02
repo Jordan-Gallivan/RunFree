@@ -10,6 +10,7 @@ import SwiftUI
 
 struct RunView: View {
     @EnvironmentObject private var appData: AppData
+    @EnvironmentObject private var controller: PolarController
     @State private var editActive: Bool = false
     @Binding var showAddRunViewItems: Bool
     
@@ -40,7 +41,9 @@ struct RunView: View {
                     if !appData.timerActive {
                         Task(priority: .high) {
                             await appData.activateElapsedTimer()
+                            controller.hrStreamStart()
                         }
+                        
                     } else {
                         appData.pauseElapsedTimer()
                     }
@@ -58,6 +61,7 @@ struct RunView: View {
                     Spacer()
                     Button("  Reset  ") {
                         appData.deactivateElapsedTimer()
+                        controller.hrStreamStop()
                     }
                     .buttonStyle(DefaultButton(buttonColor: .red, textColor: .white))
                     Spacer()
@@ -65,6 +69,19 @@ struct RunView: View {
             }
         }
         .toolbar {
+            ToolbarItem(placement: .topBarLeading) {
+                Button(action: {
+                    appData.viewPath.removeLast()
+                }, label: {
+                    HStack {
+                        Image(systemName: "chevron.backward")
+                            .symbolRenderingMode(.palette)
+                            .foregroundColor(.accentColor)
+                        Text("Weather")
+                            .foregroundColor(.accentColor)
+                    }
+                })
+            }
             ToolbarItem {
                 Button(editActive ? "Done" : "Edit") {
                     editActive.toggle()
@@ -81,6 +98,13 @@ struct RunView: View {
                     SettingsButton()
                 }
             }
+        }
+        .navigationBarBackButtonHidden()
+        .onAppear {
+            UIApplication.shared.isIdleTimerDisabled = true
+        }
+        .onDisappear {
+            UIApplication.shared.isIdleTimerDisabled = false
         }
     }
     

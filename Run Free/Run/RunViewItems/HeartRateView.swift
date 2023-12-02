@@ -8,7 +8,7 @@
 import Foundation
 import SwiftUI
 
-struct HeartRate: View {
+struct HeartRateView: View {
     @EnvironmentObject private var appData: AppData
     @EnvironmentObject private var controller: PolarController
 

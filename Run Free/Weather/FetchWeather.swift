@@ -30,8 +30,8 @@ class FetchWeather: ObservableObject {
         self.result = .inProgress
         
         // TODO: update lat/long from user
-        let userLat = 43.1
-        let userLong = -78.9
+        let userLat = 34.46
+        let userLong = -93.1
                 
         do {
             // fetch sunrise/sunset
@@ -88,7 +88,7 @@ class FetchWeather: ObservableObject {
         
         // TODO: add error handling
         guard let response = response as? HTTPURLResponse, response.statusCode == 200 else {
-            print("ERROR")
+            NSLog("error with fetching url: \(url).  HTTP Response: \(response)")
             return nil
         }
         
@@ -139,7 +139,7 @@ class FetchWeather: ObservableObject {
                 do {
                     metar = try Metar(weatherString: metarSting, night: night)
                 } catch {
-                    print("Error fetching Metar for: \(station.stationID)")
+                    NSLog("Error fetching Metar for: \(station.stationID)")
                     continue
                 }
                 distance = station.distanceToUser
@@ -178,7 +178,7 @@ class FetchWeather: ObservableObject {
                     distance = station.distanceToUser
                     break
                 } catch {
-                    print("Error fetching TAF for: \(station.stationID)")
+                    NSLog("Error fetching TAF for: \(station.stationID)")
                     continue
                 }
             }

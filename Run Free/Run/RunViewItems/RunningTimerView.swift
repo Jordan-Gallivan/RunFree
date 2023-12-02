@@ -10,7 +10,7 @@ import SwiftUI
 
 
 
-struct RunningTimer: View {
+struct RunningTimerView: View {
     @EnvironmentObject private var appData: AppData
     
     var displayTime: String {

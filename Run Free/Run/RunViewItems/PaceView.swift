@@ -8,7 +8,7 @@
 import Foundation
 import SwiftUI
 
-struct Pace: View {
+struct PaceView: View {
     @EnvironmentObject private var appData: AppData
 
     var body: some View {
