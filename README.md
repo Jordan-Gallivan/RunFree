@@ -87,13 +87,18 @@ Each component view described in the Run View section above is identified by a `
 # Error Handling
 # Testing
 
-#Appendix
+# Appendix
 ## A. Priority Queue
 For this application, a Priority Queue object was created utilizing a min-heap data structure.  This data structure takes any Comparable type and returns the minimum element in the queue when polled.  `PriorityQueue `offers the following functions:
+
 `add(_:)` Add an element to the priority queue.  This method returns true if the element was successfully added.  The heap property is maintained after insertion of elements
+
 `peek()` Returns the minimum element in the queue without removing it or nil if the queue is empty. 
+
 `poll()` Removes and returns the minimum element in the queue, or nil if the queue is empty.  The min-heap property is restored upon removal of the element.
+
 Lastly, an iterator, `PriorityQueueIterator` is available to allow users to iterate through the queue in increasing order without modifying the original queue.  
+
 ## B. Polar BLE SDK
 This application utilizes the Polar BLE SDK for all interaction with Polar Heart Rate devices.  All code within the application is used in accordance with the Polar Copyright.  
 https://github.com/polarofficial/polar-ble-sdk
