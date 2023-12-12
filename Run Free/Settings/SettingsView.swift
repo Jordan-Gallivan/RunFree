@@ -6,32 +6,58 @@
 //
 
 import Foundation
+import SwiftData
 import SwiftUI
 import Combine
 
+/// View to edit Applicaiton User Settings
 struct SettingsView: View {
     @EnvironmentObject private var appData: AppData
+    
+    // Query Settings Model.  Only one model in context, ensured at application initialization
+    @Environment(\.modelContext) var dbContext
+    @Query private var settingsQuery: [SettingsModel]
+    private var settings: SettingsModel { settingsQuery.first! }
+    
+    // MARK: - Computed Bindings used to update model
+    private var metric: Binding<Bool> {
+        Binding { settings.metric }
+        set: { settings.metric = $0 }
+    }
+    private var twelveHourClock: Binding<Bool> {
+        Binding { settings.twelveHourClock }
+        set: { settings.twelveHourClock = $0 }
+    }
+    private var useHeartRateZones: Binding<Bool> {
+        Binding { settings.useHeartRateZones }
+        set: { settings.useHeartRateZones = $0 }
+    }
+    
+    // Alert State variables
     @State var isAlertVisible: Bool = false
     @State var alertErrorMessage: String = ""
     
     var body: some View {
         Form {
             Section(header: Text("App preferences")) {
-                Toggle("Metric Units", isOn: $appData.metric)
-                Toggle("12-Hour Clock", isOn: $appData.twelveHourClock)
-                Toggle("Use Heart Rate Zones", isOn: $appData.useHeartRateZones)
+                Toggle("Metric Units", isOn: metric)
+
+                Toggle("12-Hour Clock", isOn: twelveHourClock)
+
+                Toggle("Use Heart Rate Zones", isOn: useHeartRateZones)
             }
-            if appData.useHeartRateZones {
+            if settings.useHeartRateZones {
                 Section(header: Text("Heart Rate Zones"), footer: Text("Each value represents the bottom of that zone.")) {
-                    HeartRateLine(zoneBottom: $appData.zone1, zoneTop: $appData.zone2, label: "Zone 1", zoneHasTop: true)
-                    HeartRateLine(zoneBottom: $appData.zone2, zoneTop: $appData.zone3, label: "Zone 2", zoneHasTop: true)
-                    HeartRateLine(zoneBottom: $appData.zone3, zoneTop: $appData.zone4, label: "Zone 3", zoneHasTop: true)
-                    HeartRateLine(zoneBottom: $appData.zone4, zoneTop: $appData.zone5, label: "Zone 4", zoneHasTop: true)
-                    HeartRateLine(zoneBottom: $appData.zone5, zoneTop: $appData.zone5, label: "Zone 5", zoneHasTop: false)
+                    HeartRateLine(heartRateZone: .zone1, label: "Zone 1")
+                    HeartRateLine(heartRateZone: .zone2, label: "Zone 2")
+                    HeartRateLine(heartRateZone: .zone3, label: "Zone 3")
+                    HeartRateLine(heartRateZone: .zone4, label: "Zone 4")
+                    HeartRateLine(heartRateZone: .zone5, label: "Zone 5")
                 }
             }
         }
         .alert(isPresented: $isAlertVisible) {
+            // alert visible if 0 value Heart Rate Zones or non-sequential zones
             Alert(title: Text(alertErrorMessage),
                   message: nil,
                   primaryButton: .default(
@@ -40,7 +66,7 @@ struct SettingsView: View {
                     },
                   secondaryButton: .cancel(
                     Text("Disable Heart Rate Zones")) {
-                        appData.useHeartRateZones = false
+                        settings.useHeartRateZones = false
                         isAlertVisible = false
                         appData.viewPath.removeLast()
             })
@@ -50,8 +76,9 @@ struct SettingsView: View {
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
                 Button(action: {
-                    let (validZones, errorMessage) = appData.areHrZonesValid()
-                    if appData.useHeartRateZones && !validZones {
+                    // validate zones and display alert if invalid
+                    let (validZones, errorMessage) = settings.heartRateZones.areHrZonesValid()
+                    if settings.useHeartRateZones && !validZones {
                         alertErrorMessage = errorMessage
                         isAlertVisible = true
                     } else {
@@ -68,7 +95,6 @@ struct SettingsView: View {
                 })
             }
         }
-        
-        // TODO: add sheet if values are nil in HR Zones
     }
+
 }

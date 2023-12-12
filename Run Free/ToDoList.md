@@ -18,27 +18,36 @@ Forecast line:
 x padding on edges of forecast line
 x % for probability
 x snow
-o alignment
+x alignment
 o moon.dust
-x BIG ONE!!!!
-    x time prior to sunset not displaying
-o precip text too big
-o 12-hour clock
+x precip text too big
+x 12-hour clock
 
 Current Weather line:
 x color code temperature 
-o temperature string instead of just a number
-o clean up alignment
+x temperature string instead of just a number
+x clean up alignment
 x sunrise sunset
 o wind compass?
 
 Run View:
 x miles vs kilometers
 x pace
-o remove dividing lines in list
+x remove dividing lines in list
 
 Closing the app:
-o deactivate timer?
+x deactivate timer?
 
+HeartRateLine:
+o zone5 plus sign too far right
 
 Error Handling
+
+Precipitation:
+o .fill for sf images
+
+Design doc
+o priority queue
+o querying model
+    moving items in the array.  position, deleting etc
+    single query for settings

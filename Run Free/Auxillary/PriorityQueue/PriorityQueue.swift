@@ -7,23 +7,12 @@
 
 import Foundation
 
-
 /// Minimum Heap data structure.
 class PriorityQueue<T:Comparable>: Queue, Sequence {
-    
     typealias Element = T
-    
     private var heap = [T]()
-    var count: Int {
-        get {
-            heap.count
-        }
-    }
-    var isEmpty: Bool {
-        get {
-            count == 0
-        }
-    }
+    var count: Int { heap.count }
+    var isEmpty: Bool { count == 0 }
     
     init() { }
     
@@ -35,6 +24,7 @@ class PriorityQueue<T:Comparable>: Queue, Sequence {
     }
     
     /// Add an element to the Heap.
+    ///
     /// - Parameter data: Element to be added to the heap.
     /// - Returns true if item was successfully added.
     @discardableResult

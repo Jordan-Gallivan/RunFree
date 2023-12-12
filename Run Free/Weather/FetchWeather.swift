@@ -7,6 +7,7 @@
 
 import Foundation
 
+/// Weather Components accessable through FetchWeather
 struct Weather {
     var metar: Metar
     var metarDistance: Double
@@ -16,6 +17,7 @@ struct Weather {
     var sunset: Date
 }
 
+/// Fetches current and forecast weather based on user's current location
 @MainActor
 class FetchWeather: ObservableObject {
     
@@ -80,16 +82,17 @@ class FetchWeather: ObservableObject {
     
     /// URL Fetch helper method
     func fetch(url: String) async throws -> Data? {
-        // TODO: update return type
-        // TODO: update error handling
-        guard let requestUrl = URL(string: url) else { fatalError() }
+        guard let requestUrl = URL(string: url) else {
+            NSLog("Error with fetching url: \(url).")
+            throw WeatherViewError.runTimeError(message: "Error with fetching url: \(url).")
+        }
         
         let (data, response) = try await URLSession.shared.data(from: requestUrl)
         
         // TODO: add error handling
         guard let response = response as? HTTPURLResponse, response.statusCode == 200 else {
             NSLog("error with fetching url: \(url).  HTTP Response: \(response)")
-            return nil
+            throw WeatherViewError.runTimeError(message: "Error with fetching url: \(url).")
         }
         
         return data
@@ -98,17 +101,20 @@ class FetchWeather: ObservableObject {
     
     /// Fetches all airports within a 40nm radius of the user.
     ///
-    /// - Parameter userLatitude: Decimal user latitude where North is positive, South is Negative.  Example 30.17 is N30.17
-    /// - Parameter userLongitude: Decimal user longitude where West is negative, and East is positive.  Example -81.6 is W81.6
+    /// - Parameters:
+    ///    - userLatitude: Decimal user latitude where North is positive, South is Negative.  Example 30.17 is N30.17
+    ///    - userLongitude: Decimal user longitude where West is negative, and East is positive.  Example -81.6 is W81.6
     ///
     /// - Returns Minimum Heap of airports ordered by their distance to the user.  If no airports with METARs exist within 40nm of the user, returns nil.
     func fetchAirports(userLatitude: Double, userLongitude: Double) async throws -> PriorityQueue<Airport>? {
         var stations: PriorityQueue<Airport>? = nil
             
-        let data = try await fetch(url: UrlConstants.GET_STATIONS_URL(userLatitude: userLatitude, userLongitude: userLongitude))
+        let data = try await fetch(url: WeatherUrlConstants.GET_STATIONS_URL(userLatitude: userLatitude, userLongitude: userLongitude))
         
-        // TODO: Update error handling
-        guard let data = data else { fatalError() }
+        guard let data = data else {
+            NSLog("Error with fetching airports at latitude: \(userLatitude), longitude: \(userLongitude)")
+            throw WeatherViewError.runTimeError(message: "Error with fetching airports at latitude: \(userLatitude), longitude: \(userLongitude)")
+        }
         
         let parser = XMLParser(data: data)
         let delegate = StationParser(userLatitude: userLatitude, userLongitude: userLongitude)
@@ -134,7 +140,7 @@ class FetchWeather: ObservableObject {
             guard station.hasMetar else {
                 continue
             }
-            let data = try await fetch(url: "\(UrlConstants.METAR_URL_PREFIX)\(station.stationID)")
+            let data = try await fetch(url: "\(WeatherUrlConstants.METAR_URL_PREFIX)\(station.stationID)")
             if let data, let metarSting = String(data: data, encoding: .utf8), metarSting != "" {
                 do {
                     metar = try Metar(weatherString: metarSting, night: night)
@@ -149,8 +155,8 @@ class FetchWeather: ObservableObject {
         }
         
         guard let metar, let distance else {
-            // TODO: update error
-            fatalError()
+            NSLog("Error fetching Metar")
+            throw WeatherViewError.runTimeError(message: "Error fetching Metar")
         }
         
         return (metar, distance)
@@ -171,7 +177,7 @@ class FetchWeather: ObservableObject {
             guard station.hasTaf else {
                 continue
             }
-            let data = try await fetch(url: "\(UrlConstants.TAF_URL_PREFIX)\(station.stationID)")
+            let data = try await fetch(url: "\(WeatherUrlConstants.TAF_URL_PREFIX)\(station.stationID)")
             if let data, let tafString = String(data: data, encoding: .utf8), tafString != "" {
                 do {
                     try taf = Taf(weatherString: tafString, sunriseSunsetToday: sunriseSunsetToday, sunriseSunsetTomorrow: sunriseSunsetTomorrow, startTimeOfDay: timeOfDay)
@@ -185,28 +191,37 @@ class FetchWeather: ObservableObject {
             
         }
         guard let taf, let distance else {
+            NSLog("Error fetching TAF")
             return (nil, nil)
         }
         
         return (taf, distance)
     }
     
+    /// Fetches the sunrise and sunset data for the provided Latitude/Longitude for the current day and the following day (tomorrow).
+    ///
+    /// - Parameters:
+    ///    - userLatitude: Decimal user latitude where North is positive, South is Negative.  Example 30.17 is N30.17
+    ///    - userLongitude: Decimal user longitude where West is negative, and East is positive.  Example -81.6 is W81.6
+    ///
+    ///  - Returns: Tuple of SunriseSunsetDate objects for today and tomorrow (today's sunrise/sunset, tomorrow's sunrise/sunset)
     func fetchSunriseSunset(userLatitude: Double, userLongitude: Double) async throws -> (SunriseSunsetDateObject, SunriseSunsetDateObject) {
-        let dataToday = try await fetch(url: UrlConstants.GET_TODAY_SUNRISE_SUNSET_URL(userLatitude: userLatitude, userLongitude: userLongitude))
-        let dataTomorrow = try await fetch(url: UrlConstants.GET_TOMORROW_SUNRISE_SUNSET_URL(userLatitude: userLatitude, userLongitude: userLongitude))
+        let dataToday = try await fetch(url: WeatherUrlConstants.GET_TODAY_SUNRISE_SUNSET_URL(userLatitude: userLatitude, userLongitude: userLongitude))
+        let dataTomorrow = try await fetch(url: WeatherUrlConstants.GET_TOMORROW_SUNRISE_SUNSET_URL(userLatitude: userLatitude, userLongitude: userLongitude))
         
         guard let dataToday, let dataTomorrow else {
+            NSLog("Error fetching sunrise/sunset")
             throw WeatherViewError.runTimeError(message: "error fetching sunrise/sunset")
         }
         let sunriseSunsetParserToday: SunriseSunsetParser = try! JSONDecoder().decode(SunriseSunsetParser.self, from: dataToday)
         let sunriseSunsetParserTomorrow: SunriseSunsetParser = try! JSONDecoder().decode(SunriseSunsetParser.self, from: dataTomorrow)
         
         guard sunriseSunsetParserToday.status == .OK && sunriseSunsetParserTomorrow.status == .OK else {
-            throw WeatherViewError.runTimeError(message: "error fetching sunrise/sunset")
+            NSLog("Error fetching sunrise/sunset")
+            throw WeatherViewError.runTimeError(message: "Error fetching sunrise/sunset")
         }
         
         return (SunriseSunsetDateObject(sunriseSunset: sunriseSunsetParserToday.results), SunriseSunsetDateObject(sunriseSunset: sunriseSunsetParserTomorrow.results))
-        
     }
     
 }

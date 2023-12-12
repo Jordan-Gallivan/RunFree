@@ -31,6 +31,7 @@ let TafQualifierMatcher = Regex {
     )
 }
 
+/// Regular expression to match TAF Forecasted window
 let TafForecastWindowMather = Regex {
     Capture{
         /\d{4}/

@@ -6,13 +6,16 @@
 //
 
 import SwiftUI
+import SwiftData
 
 
 struct ContentView: View {
     @EnvironmentObject private var appData: AppData
+    @Environment(\.modelContext) var dbContext
+    @Query var runComponents: [RunComponentModel]
+    @Query private var settingsQuery: [SettingsModel]
     @EnvironmentObject var weatherData: FetchWeather
     @Environment(\.colorScheme) var colorScheme
-    @State var showAddRunViewItems: Bool = false
     @State var selectedForecasts: Set<Forecast> = []
     
     var body: some View {
@@ -75,7 +78,7 @@ struct ContentView: View {
                             SettingsButton()
                         }
                     }
-                case let .failure(error):
+                case .failure(_):
                     VStack {
                         Image(systemName: "icloud.slash")
                             .symbolRenderingMode(.palette)
@@ -96,15 +99,12 @@ struct ContentView: View {
                 if viewID == "Settings View" {
                     SettingsView()
                 } else if viewID == "Run View" {
-                    RunView(showAddRunViewItems: $showAddRunViewItems)
+                    RunView()
                 } else if viewID == "Weather View" {
-                    WeatherView()
+                    ContentView()
                 }
                 
             })
-            .sheet(isPresented: $showAddRunViewItems) {
-                AddRunViewItems()
-            }
         }
         .task {
             await self.weatherData.reload()
@@ -112,12 +112,31 @@ struct ContentView: View {
         .refreshable {
             await self.weatherData.reload()
         }
+        .onAppear {
+            // Initialize persistent data
+            if runComponents.isEmpty {
+                DEFAULT_RUN_COMPONENTS.forEach { component in
+                    dbContext.insert(component)
+                }
+            }
+            if settingsQuery.isEmpty {
+                dbContext.insert(SettingsModel())
+            } else if !settingsQuery.first!.heartRateZones.areHrZonesValid().0 {
+                settingsQuery.first!.heartRateZones.resetHrZones()
+                settingsQuery.first!.useHeartRateZones = false
+            }
+        }
     }
 }
 
-struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        ContentView()
-    }
-}
+//#Preview {
+//    ContentView(appData: <#T##AppData#>, dbContext: <#T##arg#>, runComponents: <#T##[RunComponent]#>, weatherData: <#T##FetchWeather#>, colorScheme: <#T##arg#>, showAddRunViewItems: <#T##Bool#>, selectedForecasts: <#T##Set<Forecast>#>)
+//}
+//
+//struct ContentView_Previews: PreviewProvider {
+//    static var previews: some View {
+//        ContentView()
+//            .modelContainer(for: [RunComponent.self])
+//    }
+//}
 

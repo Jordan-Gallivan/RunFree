@@ -11,95 +11,42 @@ import MapKit
 
 class AppData: NSObject, ObservableObject, CLLocationManagerDelegate {
     
-    
-    /** User Settings */
+    /// Navigation Path
     @Published var viewPath = NavigationPath()
-    @Published var metric: Bool = false
-    @Published var twelveHourClock: Bool = false
-    @Published var useHeartRateZones: Bool = false
     
-    /** Heart Rate Components */
-    @Published var heartRate: Int = 0
-    @Published var zone1: Int?
-    @Published var zone2: Int?
-    @Published var zone3: Int?
-    @Published var zone4: Int?
-    @Published var zone5: Int?
-    var currentHeartZone: HeartRateZones? {
-        guard let zone1, let zone2, let zone3, let zone4, let zone5 else {
-            return nil
-        }
-        switch heartRate {
-        case 0..<zone1:
-            return .warmUp
-        case zone1..<zone2:
-            return .zone1
-        case zone2..<zone3:
-            return .zone2
-        case zone3..<zone4:
-            return .zone3
-        case zone4..<zone5:
-            return .zone4
-        case zone5..<250:
-            return .zone5
-        default:
-            return nil
-        }
-    }
-    func areHrZonesValid() -> (Bool, String) {
-        guard let zone1, let zone2, let zone3, let zone4, let zone5 else {
-            return (false, "Heart Rate Zones must be greater than 0")
-        }
-        if !(zone1 != 0 && zone2 != 0 && zone3 != 0 && zone4 != 0 && zone5 != 0) {
-            return (false, "Heart Rate Zones must be greater than 0")
-        }
-        if zone1 < zone2 && zone2 < zone3 && zone3 < zone4 && zone4 < zone5 {
-            return (true, "")
-        }
-        var errorMessage = ""
-        if zone1 >= zone2 {
-            errorMessage.append("Zone 1 must be less than Zone 2. \n")
-        }
-        if zone2 >= zone3 {
-            errorMessage.append("Zone 2 must be less than Zone 3. \n")
-        }
-        if zone3 >= zone4 {
-            errorMessage.append("Zone 3 must be less than Zone 4. \n")
-        }
-        if zone4 >= zone5 {
-            errorMessage.append("Zone 4 must be less than Zone 5. \n")
-        }
-        
-        return (false, errorMessage)
-    }
     
-    /** Run View Components */
+    /// Edit Components
+    @Published var selectedComponentToEdit: RunComponentModel? = nil
+    
+    /// Run View Components
     @Published var timerActive: Bool = false
     @Published var timerPaused: Bool = false
     
-    /* Time Componenets */
+    /* Heart Rate */
+    @Published var heartRate: Int = 0
+    
+    // MARK: - Elapsed Timer
     @Published var timer: Timer? = nil
     @Published var elapsedTime: Int = 0  // milliseconds
     @Published var currentTimeFormat: CurrentTimeFormat = .seconds
     
-    /* Distance Components */
+    // MARK: - Elapsed Distance
     private var prevLocation: CLLocation?
     private var currentLocation: CLLocation?
     private var elapsedDistanceInMeters: Double = 0
-    var elapsedDistance: Double {
+    func elapsedDistance(metric: Bool) -> Double {
         return metric ? self.elapsedDistanceInMeters / 1000.0 : self.elapsedDistanceInMeters / 1609.34
     }
     
-    /* Pace Components */
+    // MARK: - Pace
     private var distanceFiveSecondsAgo: Double = 0
     var paceSecondsPerMeter: Double = 0 // seconds per meter
-    var pace: Int {
+    func pace(metric: Bool) -> Int { 
         return Int(metric ? self.paceSecondsPerMeter * 1000 : self.paceSecondsPerMeter * 1609.34)
     }
     
     @MainActor
     func activateElapsedTimer() async {
-        
         self.prevLocation = manager.location
         self.currentLocation = manager.location
         
@@ -149,15 +96,7 @@ class AppData: NSObject, ObservableObject, CLLocationManagerDelegate {
         self.elapsedTime = 0
     }
     
-    @Published var runViewItems: [RunViewItem] = [
-        RunViewItem(name: "Time", runViewType: .timer),
-        RunViewItem(name: "Distance", runViewType: .distance),
-        RunViewItem(name: "Pace", runViewType: .pace),
-        RunViewItem(name: "Heart Rate", runViewType: .heartRate),
-    ]
-    
-    
-    /** Location Manager */
+    // MARK: - Location Manager
     let manager = CLLocationManager()
     @Published var isAuthorized: Bool = false
     
@@ -200,15 +139,5 @@ enum CurrentTimeFormat: String {
             self = .hours
         }
     }
-            
-//    func getFormatter() -> String {
-//        switch self {
-//        case .seconds:
-//            return "s"
-//        case .minutes:
-//            return "m:ss"
-//        case .hours:
-//            return "h:mm:ss"
-//        }
-//    }
+
 }

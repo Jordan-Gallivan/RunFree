@@ -25,14 +25,14 @@ let SKY_CONDITIONS: Set<String> = [
 
 /// Cloud Conditions used to determine the prevailing cloud coverage.
 ///  Overcast > Broken > Scattered > Few > Skies Clear
-public enum Clouds: String, Comparable {
+enum Clouds: String, Comparable {
     case OVC //= "Overcast"
     case BKN //= "Broken"
     case SCT //= "Scattered"
     case FEW //= "Few"
     case SKC //= "Skies Clear"
     
-    public static func < (lhs: Clouds, rhs: Clouds) -> Bool {
+    static func < (lhs: Clouds, rhs: Clouds) -> Bool {
         switch (lhs, rhs) {
         case (.OVC, .OVC):
             return false
@@ -65,7 +65,7 @@ public enum Clouds: String, Comparable {
         }
     }
     
-    public static func == (lhs: Clouds, rhs: Clouds) -> Bool {
+    static func == (lhs: Clouds, rhs: Clouds) -> Bool {
         switch (lhs, rhs) {
         case (.OVC, .OVC):
             return true
@@ -82,18 +82,52 @@ public enum Clouds: String, Comparable {
         }
     }
     
-    func cloudImage(night: Bool) -> Image {
+    func cloudString() -> String {
         switch self {
-        case .SKC:
-            fallthrough
-        case .FEW:
-            return Image(systemName: night ? "moon.stars" : "sun.max")
-        case .SCT:
-            return Image(systemName: night ? "cloud.moon" : "cloud.sun")
-        case .BKN:
-            fallthrough
         case .OVC:
-            return Image(systemName: "cloud")
+            return "Overcast Skies"
+        case .BKN:
+            return "Cloudy"
+        case .SCT:
+            return "Partially Cloudy"
+        case .FEW:
+            return "Few Clouds"
+        case .SKC:
+            return "Clear Skies"
+        }
+    }
+    
+    func cloudImage(night: Bool) -> WeatherImage {
+        switch self {
+        case .SKC, .FEW:
+            if night {
+                return WeatherImage(image: Image(systemName: "moon.stars").symbolRenderingMode(.palette),
+                                    lightModeColors: [.primary, .yellow, .primary],
+                                    darkModeColors: [.primary, .white, .primary]
+                )
+            } else {
+                return WeatherImage(image: Image(systemName: "sun.max.fill").symbolRenderingMode(.palette),
+                                    lightModeColors: [.yellow, .primary, .primary],
+                                    darkModeColors: [.yellow, .primary, .primary]
+                )
+            }
+        case .SCT:
+            if night {
+                return WeatherImage(image: Image(systemName: "cloud.moon").symbolRenderingMode(.palette),
+                                    lightModeColors: [.primary, .white, .primary],
+                                    darkModeColors: [.primary, .white, .primary]
+                )
+            } else {
+                return WeatherImage(image: Image(systemName: "cloud.sun").symbolRenderingMode(.palette),
+                                    lightModeColors: [.primary, .yellow, .primary],
+                                    darkModeColors: [.primary, .yellow, .primary]
+                )
+            }
+        case .BKN, .OVC:
+            return WeatherImage(image: Image(systemName: "cloud"),
+                                lightModeColors: [.primary, .primary, .primary],
+                                darkModeColors:[.primary, .primary, .primary]
+            )
         }
     }
 }

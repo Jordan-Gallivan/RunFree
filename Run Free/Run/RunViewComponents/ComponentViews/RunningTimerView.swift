@@ -8,12 +8,17 @@
 import Foundation
 import SwiftUI
 
-
-
-struct RunningTimerView: View {
+/// Displays the elapsed Timer.
+struct RunningTimerView: View, RunComponentProperties {
     @EnvironmentObject private var appData: AppData
     
+    // MARK: - RunComponentProperties
+    var name: String
+    var componentSize: CGFloat
+    var componentColor: Color
+    
     var displayTime: String {
+        // calculate hours, minutes, and seconds
         var eT = appData.elapsedTime
         let hours = eT / 3600000
         eT %= 3600000
@@ -21,23 +26,22 @@ struct RunningTimerView: View {
         eT %= 60000
         let seconds = eT / 1000
         
-        
+        // format and return elapsed time
         switch appData.currentTimeFormat {
         case .seconds:
             eT %= 1000
             let decimalSeconds = eT / 100
             return "\(seconds).\(decimalSeconds)"
         case .minutes:
-            return "\(minutes):\(seconds)"
+            return String(format: "%d:%02d", minutes, seconds)
         case .hours:
-            return "\(hours):\(minutes):\(seconds)"
+            return String(format: "%d:%02d:%02d", hours, minutes, seconds)
         }
     }
     var body: some View {
-        DisplayLine(name: "Time") {
-            Text(displayTime)
-                .font(.largeTitle)
-                .fontWeight(.bold)
-        }
+        Text(displayTime)
+            .font(.system(size: componentSize))
+            .fontWeight(.bold)
+            .foregroundStyle(componentColor)
     }
 }

@@ -16,11 +16,11 @@ class PolarController: ObservableObject {
 
     private static var deviceId = "9AD13824"
     
-    private var currentHr: Int? = nil
+    var currentHr: Int? = nil
     var hrSteaming: Bool = true
     private var hrSteamDisposable: Disposable?
 
-    var hr: String {
+    var hrString: String {
         if let currentHr {
             return "\(currentHr)"
         }

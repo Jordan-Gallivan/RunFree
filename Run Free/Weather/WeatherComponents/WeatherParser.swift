@@ -7,15 +7,20 @@
 
 import Foundation
 
-/// Static Struc to parse components of a METAR or TAF
-final class WeatherParser {
+/// Static class to parse components of a METAR or TAF
+enum WeatherParser {
     
+    /// Parses a line from a METAR or TAF into its requisite components.
     ///
-    ///- Returns: (precipitation, windDirection, windSpeed, clouds, temperature)
-    static func parseWeather(weather: [String], metar: Bool = false) -> ([Precipitation]?, String?, Int?, Clouds?, Int?) {
+    /// - Parameters:
+    ///    - weather: Array of string values that make up the METAR or TAF line.
+    ///    - metar: True if weather line is from a METAR.
+    ///
+    /// - Returns: (weatherCondition, windDirection, windSpeed, clouds, temperature).  Note all return values are optional.
+    static func parseWeather(weather: [String], isMetar: Bool = false) -> ([WeatherCondition]?, String?, Int?, Clouds?, Int?) {
         
         var j = 0
-        var precipitation: [Precipitation]? = nil
+        var weatherCondition: [WeatherCondition]? = nil
         var windDirection: String? = nil
         var windSpeed: Int? = nil
         var clouds: Clouds? = nil
@@ -36,7 +41,7 @@ final class WeatherParser {
             j += 1
         }
         
-        // parse precipitation
+        // parse weather conditions
         var k = j
         while k < weather.count {
             let entry = weather[k]
@@ -49,7 +54,7 @@ final class WeatherParser {
             k += 1
         }
         if k != j {
-            precipitation = parsePrecipitation(precipitation: weather[j..<k].map {String($0)})
+            weatherCondition = parseWeatherCondition(weatherCondition: weather[j..<k].map {String($0)})
         }
         j = k
         
@@ -68,7 +73,8 @@ final class WeatherParser {
             clouds = parseClouds(cloudConditions: weather[j..<k])
         }
         
-        if metar {
+        // parse temperature if a METAR
+        if isMetar {
             while k < weather.count {
                 let entry = weather[k]
                 if entry.contains("/") {
@@ -82,14 +88,14 @@ final class WeatherParser {
                             : nil
         }
         
-        return (precipitation, windDirection, windSpeed, clouds, temperature)
+        return (weatherCondition, windDirection, windSpeed, clouds, temperature)
     }
     
     /// Calculates the wind direction and speed.
     ///
     /// - Parameter wind: String containing both the wind direciton and speed.  Example "04015KT".
     /// - Returns: (Wind Direction, Wind Speed).
-    static func parseWind(wind: String) -> (String, Int) {
+    private static func parseWind(wind: String) -> (String, Int) {
         let windDirInt = Int(wind[..<wind.index(wind.startIndex, offsetBy: 3)]) ?? -1
         let windSpeed = Int(wind[wind.index(wind.startIndex, offsetBy: 3)..<wind.index(wind.startIndex, offsetBy: 5)]) ?? 0
         var windDirStr = ""
@@ -119,21 +125,22 @@ final class WeatherParser {
         return (windDirStr, windSpeed)
     }
     
-    /// Calculates the current precipitation as an array of strings.
+    /// Calculates the current weather condition as an array of strings.
     ///
-    /// - Parameter precipitation: An array of precipitation strings to be parsed.  Example: ["VCTS", "SN", "FZFG"]
-    /// - Returns: A comma separated String of precipitation.  Example "Thunderstorm In the Vicinity, Snow, Freezing Fog".
-    static func parsePrecipitation(precipitation: [String]) -> [Precipitation]? {
+    /// - Parameter precipitation: An array of precipitation strings to be parsed.  Example: ["VCTS", "SN", "FZFG"].
+    /// - Returns: A WeatherCondition Struct containing the name, SF Image prefix, and associate cloud/sun modifiers.
+    private static func parseWeatherCondition(weatherCondition: [String]) -> [WeatherCondition]? {
         
-        guard precipitation.count > 0 else {
+        guard weatherCondition.count > 0 else {
             return nil
         }
-        var returnArray: [Precipitation] = []
+        var returnArray: [WeatherCondition] = []
         
-        for precip in precipitation{
+        for precip in weatherCondition{
             var intensity = ""
             var i = precip.startIndex
             
+            // annotate heave or light modifiers (+ or - before weather condition)
             switch precip[i] {
             case "+":
                 intensity += "Heavy "
@@ -145,7 +152,7 @@ final class WeatherParser {
                 break
             }
             
-            guard var currPrecip = PrecipitationConstants.PRECIPITATION_DICTIONARY[String(precip[i..<precip.endIndex])] else {
+            guard var currPrecip = WeatherConditionConstants.WEATHER_CONDITION_DICTIONARY[String(precip[i..<precip.endIndex])] else {
                 continue
             }
             
@@ -161,7 +168,7 @@ final class WeatherParser {
     ///
     /// - Parameter cloudConditions: An array of cound conditions.  Example: ["BKN003", "OVC010"]
     /// - Returns the prevailing cloud condition.
-    static func parseClouds<T: Sequence>(cloudConditions: T) -> Clouds where T.Iterator.Element == String {
+    private static func parseClouds<T: Sequence>(cloudConditions: T) -> Clouds where T.Iterator.Element == String {
         var predomCloud = Clouds.SKC
         
         for cloudCondition in cloudConditions {
@@ -186,11 +193,11 @@ final class WeatherParser {
         return predomCloud
     }
     
-    /// Calculates the current temperature in degrees celsius
+    /// Calculates the current temperature in degrees celsius.
     ///
-    /// - Parameter tempString: Current Temperature/DewPoint string.  Example: M02/M02
+    /// - Parameter tempString: Current Temperature/DewPoint string.  Example: M02/M02.
     /// - Returns current temperature in degrees celsius.
-    static func parseTemperature(temperatureString tempString: String) -> Int {
+    private static func parseTemperature(temperatureString tempString: String) -> Int {
         var minusMultiplier = 1
         
         var start = tempString.startIndex

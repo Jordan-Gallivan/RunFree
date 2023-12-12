@@ -5,9 +5,7 @@ import Foundation
 struct BatteryStatusFeature {
     var isSupported: Bool
     var batteryLevel: UInt {
-        get {
-            return _batteryLevel
-        }
+        get { _batteryLevel }
         set {
             if newValue >= 0 && newValue <= 100 {
                 _batteryLevel = newValue

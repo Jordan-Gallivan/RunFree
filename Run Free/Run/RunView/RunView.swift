@@ -7,34 +7,57 @@
 
 import Foundation
 import SwiftUI
+import SwiftData
 
 struct RunView: View {
     @EnvironmentObject private var appData: AppData
     @EnvironmentObject private var controller: PolarController
-    @State private var editActive: Bool = false
-    @Binding var showAddRunViewItems: Bool
+    @Environment(\.modelContext) var dbContext
+    @Query(sort: \RunComponentModel.position, order: .forward) var runComponents: [RunComponentModel]
+    
+    // Query Settings Model.  Only one model in context, ensured at application initialization
+    @Query private var settingsQuery: [SettingsModel]
+    private var settings: SettingsModel { settingsQuery.first! }
+    
+    @State private var editActive: Bool = false // toggles overriden edit mode of List
+    @State private var editRunComponentSettings: Bool = false   // activates sheet to edit individual components
+    @State private var settingsDetent: PresentationDetent = .medium // initial component settings sheet size
+    @State private var addRunComponents: Bool = false   // activates AddRunViewItems sheet
+    // initial AddRunViewItems sheet size
+    @State private var addRunComponentDetent: PresentationDetent = PresentationDetent.fraction(CGFloat(0.25))
+    
     
     var body: some View {
         VStack {
             List {
-                ForEach(appData.runViewItems, id: \.anyHashableID) { runViewItem in
-                    if runViewItem.isVisible {
-                        runViewItem
+                ForEach(runComponents, id: \.self) { runComponent in
+                    // verify component is visible and only display zones if in use by user
+                    if runComponent.isVisible &&
+                        (runComponent.runComponentType != .zones  || (runComponent.runComponentType == .zones && settings.useHeartRateZones )) {
+                        RunComponentView(runViewComponent: runComponent)
+                            .onTapGesture {
+                                // override tap gesture in edit mode to customize component settings
+                                if editActive && runComponent.runComponentType != .zones {
+                                    appData.selectedComponentToEdit = runComponent
+                                    editRunComponentSettings = true
+                                }
+                            }
+                            .listRowSeparator(.hidden)
                     }
                 }
                 .onMove { source, destination in
-                    appData.runViewItems.move(fromOffsets: source, toOffset: destination)
+                    var updatedPositions = runComponents
+                    updatedPositions.move(fromOffsets: source, toOffset: destination)
+                    for (index, item) in updatedPositions.enumerated() {
+                        item.position = index
+                    }
                 }
                 .onDelete { indexes in
-//                    for index in indexes {
-//                        appData.runViewItems[index].isVisible = false
-//                    }
                     deleteRunViewItems(indexes)
                 }
             }
             .listStyle(.plain)
             .environment(\.editMode, .constant(editActive ? EditMode.active : EditMode.inactive))
-            
             
             if !appData.timerPaused {
                 Button(appData.timerActive ? "  Stop  " : "   Run!   " ) {
@@ -49,6 +72,7 @@ struct RunView: View {
                     }
                 }
                 .buttonStyle(DefaultButton(buttonColor: appData.timerActive ? .red : .green, textColor: .white))
+                
             } else {
                 HStack {
                     Spacer()
@@ -90,7 +114,7 @@ struct RunView: View {
             ToolbarItem {
                 if editActive {
                     Button(action: {
-                        showAddRunViewItems.toggle()
+                        addRunComponents.toggle()
                     }, label: {
                         Image(systemName: "plus")
                     })
@@ -101,29 +125,58 @@ struct RunView: View {
         }
         .navigationBarBackButtonHidden()
         .onAppear {
+            // disable screen idling
             UIApplication.shared.isIdleTimerDisabled = true
         }
         .onDisappear {
+            // re-enable screen idling
             UIApplication.shared.isIdleTimerDisabled = false
+        }
+        .sheet(isPresented: $editRunComponentSettings) {
+            // customize component settings
+            RunComponentSettingsView()
+                .presentationDetents(
+                    [.medium],
+                    selection: $settingsDetent
+                )
+        }
+        .sheet(isPresented: $addRunComponents) {
+            // add components not currently displayed
+            AddRunViewItems()
+                .presentationDetents(
+                    [PresentationDetent.fraction(CGFloat(0.25)), PresentationDetent.fraction(CGFloat(0.10))],
+                    selection: $addRunComponentDetent
+                )
         }
     }
     
     private func deleteRunViewItems(_ indexes: IndexSet) {
-        var itemsToDelete: Set<RunViewItem> = []
+        // duplicate items to be deleted
+        var itemsToDelete: Set<RunComponentModel> = []
+        var updatedPositions = runComponents
         indexes.forEach { index in
-            itemsToDelete.insert(appData.runViewItems[index])
+            itemsToDelete.insert(runComponents[index])
         }
+        
+        // iterate over queried components, move components to delete to end of array
         itemsToDelete.forEach { item in
-            for i in 0..<appData.runViewItems.count {
-                if appData.runViewItems[i].name == item.name {
-                    appData.runViewItems.remove(at: i)
-                    appData.runViewItems.append(item)
+            for i in 0..<updatedPositions.count {
+                if updatedPositions[i].name == item.name {
+                    updatedPositions.remove(at: i)
+                    updatedPositions.append(item)
                     break
                 }
             }
         }
+        
+        // toggle isVisible for delted items
         for i in 1...itemsToDelete.count {
-            appData.runViewItems[appData.runViewItems.count - i].isVisible = false
+            updatedPositions[updatedPositions.count - i].isVisible = false
+        }
+        
+        // update position of each component
+        for (index, item) in updatedPositions.enumerated() {
+            item.position = index
         }
     }
 }

@@ -6,14 +6,20 @@
 //
 
 import Foundation
+import SwiftData
 import SwiftUI
 
+/// Single line of forecast.  Two viewing options: normal and expanded.  In expaned view, all weather condition lines are displayed as well as wind information.
 struct ForecastLine: View {
     @EnvironmentObject private var appData: AppData
+    @Environment(\.modelContext) var dbContext
+    @Environment(\.colorScheme) var colorScheme
+    // Query Settings Model.  Only one model in context, ensured at application initialization
+    @Query private var settingsQuery: [SettingsModel]
+    private var settings: SettingsModel { settingsQuery.first! }
     
     var forecast: Forecast
-    var weatherIcon: Image
-    var weatherIconColors: [Color]
+    var weatherImage: WeatherImage
     var windIcon: Image? = nil
     var probability: Text? = nil
     var backgroundColor: Color
@@ -21,7 +27,7 @@ struct ForecastLine: View {
     
     var forecastTimeFormat: DateFormatter {
         let formatter = DateFormatter()
-        if appData.twelveHourClock {
+        if settings.twelveHourClock {
             formatter.dateFormat = "h:mm a"
             return formatter
         } else {
@@ -29,12 +35,6 @@ struct ForecastLine: View {
             return formatter
         }
     }
-    
-    /*
-     
-     | time     windIcon?   prob?   precipString    precipIcon/cloud    |
-     
-     */
     
     var body: some View {
         HStack {
@@ -46,7 +46,7 @@ struct ForecastLine: View {
             // Wind
             if self.expandedView,
                let windDirection = forecast.windDirection,
-               let windSpeed = forecast.convertedWindSpeed(metric: appData.metric) {
+               let windSpeed = forecast.convertedWindSpeed(isMetric: settings.metric) {
                 VStack {
                     HStack {
                         WeatherImageGenerator.windIcon
@@ -57,7 +57,7 @@ struct ForecastLine: View {
                     HStack {
                         Text("at")
                             .font(.caption2)
-                        Text("\(windSpeed)\(appData.metric ? "kph" : "mph")")
+                        Text("\(windSpeed)\(settings.metric ? "kph" : "mph")")
                             .font(.footnote)
                     }
                 }
@@ -94,26 +94,37 @@ struct ForecastLine: View {
                 Text("Sunrise")
                 Spacer()
             } else {
-                if let precipitation = forecast.precipitation {
+                if let weatherCondition = forecast.weatherCondition {
                     if self.expandedView {
                         VStack {
-                            ForEach(precipitation) { precip in
-                                Text(precip.description)
+                            ForEach(weatherCondition) { wxCondition in
+                                Text(wxCondition.description)
                                     .font(.footnote)
                             }
                         }
                     } else {
-                        Text(precipitation[0].description)
+                        Text(weatherCondition[0].description)
                             // TODO: size text to fit
                     }
                     Spacer()
+                } else if let clouds = forecast.clouds {
+                    Text(clouds.cloudString())
+                    Spacer()
                 }
+                
             }
             
-            // Weather Icon
-            weatherIcon
-                .font(.title2)
-                .foregroundStyle(self.weatherIconColors[0], self.weatherIconColors[1], self.weatherIconColors[2])
+            // Weather Image
+            if colorScheme == .dark {
+                weatherImage.image
+                    .font(.title2)
+                    .foregroundStyle(weatherImage.darkModeColors[0], weatherImage.darkModeColors[1], weatherImage.darkModeColors[2])
+            } else {
+                weatherImage.image
+                    .font(.title2)
+                    .foregroundStyle(weatherImage.lightModeColors[0], weatherImage.lightModeColors[1], weatherImage.lightModeColors[2])
+            }
+            
         }
         .padding([.horizontal], 10)
         .padding([.vertical], 7)
@@ -125,18 +136,18 @@ struct ForecastLine: View {
         self.expandedView = expandedView
         self.backgroundColor = forecast.backgroundColor
         
+        // determine if a sunrise/sunset line
         if forecast.sunrise {
-            self.weatherIcon = WeatherImageGenerator.generateSunriseSunsetImage(sunrise: true, colorScheme: colorScheme)
-            self.weatherIconColors = [.primary, .yellow, .primary]
+            self.weatherImage = WeatherImageGenerator.generateSunriseSunsetImage(sunrise: true, colorScheme: colorScheme)
             self.forecast = forecast
             return
         } else if forecast.sunset {
-            self.weatherIcon = WeatherImageGenerator.generateSunriseSunsetImage(sunset: true, colorScheme: colorScheme)
-            self.weatherIconColors = [.primary, .yellow, .primary]
+            self.weatherImage = WeatherImageGenerator.generateSunriseSunsetImage(sunset: true, colorScheme: colorScheme)
             self.forecast = forecast
             return
         }
         
+        // determine if wind is strong enough to include "windy" image
         if forecast.windIcon {
             self.windIcon = WeatherImageGenerator.windIcon
         }
@@ -147,19 +158,16 @@ struct ForecastLine: View {
         
         let clouds = forecast.clouds ?? Clouds.SKC
         
-        if let precipitation = forecast.precipitation {
-            let weatherIconOptions = WeatherImageGenerator.generateWeatherIcon(base: precipitation[0].icon,
-                                                                               sunAndCloud: precipitation[0].modifiers,
+        // parse precipitation or display current cloud conditions
+        if let weatherCondition = forecast.weatherCondition {
+            self.weatherImage = WeatherImageGenerator.generateWeatherIcon(sfImageSuffix: weatherCondition[0].sfImageSuffix,
+                                                                               sunAndCloud: weatherCondition[0].modifiers,
                                                                                cloudCoverage: clouds,
                                                                                night: forecast.night)
-            self.weatherIcon = weatherIconOptions.weatherIcon
-            self.weatherIconColors = weatherIconOptions.colors
         } else {
-            self.weatherIcon = clouds.cloudImage(night: forecast.night)
-            self.weatherIconColors = [.primary, .primary, .primary]
+            self.weatherImage = clouds.cloudImage(night: forecast.night)
         }
         self.forecast = forecast
-        
     }
     
 }

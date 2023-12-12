@@ -8,8 +8,8 @@
 import Foundation
 import SwiftUI
 
+/// Default button with custom styling 
 struct DefaultButton: ButtonStyle {
-    
     let buttonColor: Color
     let textColor: Color
     

@@ -16,14 +16,11 @@ class Taf {
     private var currentDateObject: Date // Date object, rounded floor(hour)
     private var currentTimeInSeconds: TimeInterval  // time interval in seconds of currentDateObject
     
-    var metric: Bool = false
-    
     private enum ComponentOptions {
         case wind, vis, precip, cloud, other
     }
     
-    required init(weatherString: String, 
-                  metric: Bool = false,
+    required init(weatherString: String,
                   forecastDuration: Int = 5,
                   sunriseSunsetToday: SunriseSunsetDateObject,
                   sunriseSunsetTomorrow: SunriseSunsetDateObject,
@@ -46,11 +43,14 @@ class Taf {
         // initialize forecasts array
         let initTime = (currentTime / 100) * 100
         
+        // initialize forecasts array with times and sunrise/sunset lines (if applicable)
         for i in 0...forecastDuration {
+            // increment forecast time and date object
             let forecastTime = initTime + (i * 100)
             let timeInterval = TimeInterval(i * 3600)
             let dateObject = Date(timeIntervalSinceReferenceDate: currentTimeInSeconds + timeInterval)
             
+            // determine if sunrise/sunset line
             if dateObject > currentSunriseSunset.sunsetDateObject && timeOfDay == .day {
                 forecasts.append(Forecast (
                     date: Int(dateFormat.string(from: currentSunriseSunset.sunsetDateObject))!,
@@ -68,6 +68,8 @@ class Taf {
                 ))
                 timeOfDay = .day
             }
+            
+            // update time of day if a sunrise/sunset line was passed
             let night = timeOfDay == .preSunrise || timeOfDay == .postSunSet
             forecasts.append(Forecast(
                 date: forecastTime < 2400 ? currentDate : currentDate + 1,
@@ -76,6 +78,7 @@ class Taf {
                 dateObject: dateObject
             ))
             
+            // increment day if end of day reached
             if forecastTime > 2400 {
                 timeOfDay = .preSunrise
                 currentSunriseSunset = sunriseSunsetTomorrow
@@ -83,6 +86,7 @@ class Taf {
             
         }
         
+        // alternate background colors
         for i in 0..<forecasts.count {
             if i % 2 == 0 {
                 forecasts[i].backgroundColor = .secondary.opacity(0.2)
@@ -94,12 +98,9 @@ class Taf {
         
         // TODO: valid taf call
         
-        /**
-         Populate 0 index of forecasts array
-         */
+        // Populate 0 index of forecasts array
         let tafLine = lines.remove(at: 0).split(separator: " ").map { String($0) }
         
-        // TODO: add check for valid taf
         // find wind
         var i = 0
         while i < tafLine.count && tafLine[i].firstMatch(of: /KT$/) == nil {
@@ -108,8 +109,8 @@ class Taf {
         
         // ensure taf is readable (has a wind component that was found)
         guard i < tafLine.count else {
-            // TODO: update error
-            fatalError()
+            NSLog("Invalid tafline.  No wind component. \(tafLine)")
+            throw TafError.runTimeError(message: "Invalid tafline.  No wind component. \(tafLine)")
         }
         
         // populate all forecast elements with top line of TAF
@@ -117,7 +118,7 @@ class Taf {
         
         // parse remainder of TAF
         parseTaf(tafLines: lines)
-
+        
     }
     
     private func determineValidTaf(line: String, currentDateTime: Date) -> Bool {
@@ -190,7 +191,7 @@ class Taf {
             NSLog("ERROR Converting to dateTime from string")
             return false
         }
-                
+        
         return currentDateTime <= endDateTime
     }
     
@@ -201,13 +202,13 @@ class Taf {
         }
         return str
     }
-
+    
     
     /// Parses a TAF into its wind, precipitation, and sky condition (clouds) components if they exist on that line.
     ///
     ///- Parameter tafLines: Array of TAF lines.
     private func parseTaf<T: Sequence>(tafLines lines: T) where T.Iterator.Element == String {
-
+        
         // iterate over the TAF Lines
         for line in lines {
             let components = line.split(separator: /\s/).map { String($0) }
@@ -219,7 +220,7 @@ class Taf {
             var startTime, startDate: Int
             var endTime, endDate: Int?
             var probability: Int?
-
+            
             var i = 1
             
             // Determine TAF Line qualifier if one exists
@@ -243,11 +244,11 @@ class Taf {
             
             // Continue parsing components and update applicable forecasts
             updateForecasts(components: Array(components[i..<components.count]),
-                               startTime: startTime,
-                               startDate: startDate,
-                               endTime: endTime,
-                               endDate: endDate,
-                               probability: probability)
+                            startTime: startTime,
+                            startDate: startDate,
+                            endTime: endTime,
+                            endDate: endDate,
+                            probability: probability)
         }
     }
     
@@ -278,12 +279,13 @@ class Taf {
     
     /// Continues Parsing the TAF Line into its wind, precipitation, and sky condition (clouds) components.  Then Updates the forecasts startDate/Time <= forecast < endDate/Time.
     ///
-    ///- Parameter components: TAF string to be parsed.
-    ///- Parameter startTime: Inclusive Starting time of the forecast in 24-Hour Format, rounded down to the nearest hour.  Example 1500
-    ///- Parameter startDate: Inclusive Starting date of the forecast.  Example 11
-    ///- Parameter endTime: Optional NOT Inclusive Ending time of the forecast in 24-Hour Format, rounded down to the nearest hour.  Example 2100.  If none is provided, all forecasts after the starting date/time are updated.
-    ///- Parameter startDate: Inclusive Ending Date of the forecast.  Example 12. If none is provided, all forecasts after the starting date/time are updated.
-    ///- Parameter probability: Optional probability qualifier for the forecast.
+    ///- Parameters:
+    ///   - components: TAF string to be parsed.
+    ///   - startTime: Inclusive Starting time of the forecast in 24-Hour Format, rounded down to the nearest hour.  Example 1500
+    ///   - startDate: Inclusive Starting date of the forecast.  Example 11
+    ///   - endTime: Optional NOT Inclusive Ending time of the forecast in 24-Hour Format, rounded down to the nearest hour.  Example 2100.  If none is provided, all forecasts after the starting date/time are updated.
+    ///   - startDate: Inclusive Ending Date of the forecast.  Example 12. If none is provided, all forecasts after the starting date/time are updated.
+    ///   - probability: Optional probability qualifier for the forecast.
     private func updateForecasts(components: [String], startTime: Int, startDate: Int, endTime: Int?, endDate: Int?, probability: Int? = nil) {
         // indicies for start(inclusive) and end(not inclusive) of forecasts array to be updated
         var i = 0
@@ -292,16 +294,16 @@ class Taf {
         // if forecast is on an interval (has an end time/date)
         if let endDate, let endTime {
             // index into array until forecasts[i].date == startDate and forecasts[i].time >= startTime
-            while i < forecasts.count 
+            while i < forecasts.count
                     && ((forecasts[i].date != startDate || forecasts[i].time < startTime) || (startDate == 1 && forecasts[i].date >= 28)) {
-
+                
                 i += 1
                 // TODO: Fix while conditional for end of the month...
             }
             guard i < forecasts.count else {
                 return
             }
-
+            
             j = i
             
             // index into array until forecasts[i].date == endDate and forecasts[i].time == endTime
@@ -313,12 +315,12 @@ class Taf {
             guard i != j else {
                 return
             }
-        // forecast is from or becoming
+            // forecast is from or becoming
         } else {
             // index into array until start date/time is before or equal to forecasts[i]
             while i < forecasts.count
                     && ((forecasts[i].date != startDate || forecasts[i].time < startTime) || (startDate == 1 && forecasts[i].date >= 28)) {
-
+                
                 i += 1
                 // TODO: Fix while conditional for end of the month...
             }
@@ -335,10 +337,11 @@ class Taf {
     }
     
     /// Parses the TAF Line into its componenets and updates the forecasts array.
-    /// - parameter components: TAF string to be parsed.
-    /// - parameter startIndex: Starting index for the first time of the forecast.
-    /// - parameter endIndex: Last index the forecast is valid for (NOT inclusive).
-    /// - parameter probability: Optional probabily to be included with the forecast
+    /// - Parameters:
+    ///    - components: TAF string to be parsed.
+    ///    - startIndex: Starting index for the first time of the forecast.
+    ///    - endIndex: Last index the forecast is valid for (NOT inclusive).
+    ///    - probability: Optional probabily to be included with the forecast
     ///
     private func updateForecastsFromIndicies(components comp: [String], startIndex: Int, endIndex: Int, probability: Int? = nil) {
         
@@ -350,13 +353,14 @@ class Taf {
             if !forecasts[k].sunrise && !forecasts[k].sunset {
                 forecasts[k].windDirection = windDirection ?? forecasts[k].windDirection
                 forecasts[k].windSpeed = windSpeed ?? forecasts[k].windSpeed
-                forecasts[k].precipitation = precipitation ?? forecasts[k].precipitation
+                forecasts[k].weatherCondition = precipitation ?? forecasts[k].weatherCondition
                 forecasts[k].clouds = clouds ?? forecasts[k].clouds
                 forecasts[k].probability = probability ?? forecasts[k].probability
             }
         }
     }
     
-    
-    
+    enum TafError: Error {
+        case runTimeError(message: String)
+    }
 }

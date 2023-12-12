@@ -22,7 +22,7 @@ struct Forecast: Hashable {
     var time = 0
     var windDirection: String? = nil
     var windSpeed: Int? = nil
-    var precipitation: [Precipitation]? = nil
+    var weatherCondition: [WeatherCondition]? = nil
     var clouds: Clouds? = nil
     var probability:Int? = nil
     var sunrise: Bool = false
@@ -32,19 +32,17 @@ struct Forecast: Hashable {
     var backgroundColor: Color = Color(red: 0, green: 0, blue: 0, opacity: 0)
     
     var windIcon: Bool {
-        get {
-            guard let windSpeed else {
-                return false
-            }
-            return windSpeed >= 20
+        guard let windSpeed else {
+            return false
         }
+        return windSpeed >= 20
     }
     
-    func convertedWindSpeed(metric: Bool) -> Int? {
+    func convertedWindSpeed(isMetric: Bool) -> Int? {
         guard let windSpeed else {
             return nil
         }
-        return metric
+        return isMetric
             ? Int(Double(windSpeed) * 1.852)
             : Int(Double(windSpeed) * 1.15078)
     }

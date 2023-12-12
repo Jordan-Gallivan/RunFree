@@ -14,6 +14,6 @@ protocol Queue {
     var count: Int { get }
     
     func add(_ data: Item) -> Bool
-    
     func peek() -> Item
+    func poll() -> Item
 }

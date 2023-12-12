@@ -19,5 +19,6 @@ struct Run_FreeApp: App {
                 .environmentObject(controller)
                 .environmentObject(weatherData)
         }
+        .modelContainer(for: [RunComponentModel.self, SettingsModel.self])
     }
 }

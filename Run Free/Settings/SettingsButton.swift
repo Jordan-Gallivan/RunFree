@@ -8,6 +8,7 @@
 import Foundation
 import SwiftUI
 
+/// Custom Button to display and link to settings page
 struct SettingsButton: View {
     @EnvironmentObject private var appData: AppData
     

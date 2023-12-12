@@ -7,12 +7,13 @@
 
 import Foundation
 
+/// Struct to parse XML for stations retreived from aviationweather.gov
 enum AirportElements:String, Equatable {
     case Station, station_id, latitude, longitude, METAR, TAF
 }
 
-/// Struct for storing station information
-struct Airport:Comparable {
+/// Struct for storing station information.  Station is considered less than another if it is closer to the user.
+struct Airport: Comparable {
     var stationID: String
     var latitude: Double
     var longitude: Double
@@ -29,8 +30,10 @@ struct Airport:Comparable {
     }
     
     /// Update required station information: Station ID, Latitude, or Longitude.
-    /// - Parameter mandatoryProperty: Property to be updated.
-    /// - Parameter value: String to update the property to.
+    ///
+    /// - Parameters:
+    ///    - mandatoryProperty: Property to be updated.
+    ///    - value: String to update the property to.
     mutating func updateMandatoryProperty(mandatoryProperty property: AirportElements, value: String) {
         switch (property) {
         case .station_id:
@@ -59,6 +62,7 @@ struct Airport:Comparable {
         distanceToUser = sqrt(pow(userLatitude - latitude, 2) + pow(userLongitude - longitude, 2))
     }
     
+    /// Left hand side is considered less than right hand side if it is closer to the user.
     static func < (lhs: Airport, rhs: Airport) -> Bool {
         return lhs.distanceToUser < rhs.distanceToUser
     }

@@ -7,6 +7,7 @@
 
 import Foundation
 
+/// Enum to update visibility of async views based on load status.
 enum AsyncResult<Success> {
     case empty
     case inProgress

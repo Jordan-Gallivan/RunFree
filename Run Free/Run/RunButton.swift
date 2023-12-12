@@ -8,6 +8,7 @@
 import Foundation
 import SwiftUI
 
+/// Custom button to navigate to Run View.
 struct RunButton: View {
     @EnvironmentObject private var appData: AppData
     

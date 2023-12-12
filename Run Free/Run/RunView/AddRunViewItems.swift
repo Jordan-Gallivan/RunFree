@@ -6,70 +6,25 @@
 //
 
 import Foundation
+import SwiftData
 import SwiftUI
 
+/// Sheet to toggle visibility of components not currently displayed
 struct AddRunViewItems: View {
     @EnvironmentObject private var appData: AppData
-    @Environment(\.dismiss) var dismiss
-        
-    @State private var selectedRows: Set<RunViewItem.ID> = []
-    
+    @Environment(\.modelContext) var dbContext
+    @Query(sort: \RunComponentModel.position, order: .forward) var runComponents: [RunComponentModel]
     
     var body: some View {
-        VStack {
-            List(selection: $selectedRows) {
-                ForEach(appData.runViewItems) { runViewItem in
-                    if !runViewItem.isVisible {
-                        HStack {
-                            if selectedRows.contains(runViewItem.id) {
-                                Image(systemName: "circle.inset.filled")
-                                    .symbolRenderingMode(.palette)
-                                    .foregroundStyle(.green, .primary)
-                            } else {
-                                Image(systemName: "circle")
-                            }
-                            Text(runViewItem.name)
-                                .font(.title2)
-                        }
+        List {
+            ForEach(runComponents, id: \.self) { runComponent in
+                if !runComponent.isVisible {
+                    Text(runComponent.name)
                         .onTapGesture {
-                            itemSelected(item: runViewItem.id)
+                            runComponent.isVisible.toggle()
                         }
-                    }
-                }
-                .listStyle(.plain)
-            }
-            HStack {
-                Button("Cancel") {
-                    dismiss()
-                }
-                .padding()
-                if selectedRows.count > 0 {
-                    Button("Add Selected") {
-                        addItems()
-                    }
-                    .padding()
                 }
             }
         }
     }
-    
-    private func addItems() {
-        for item in selectedRows {
-            if let index = appData.runViewItems.firstIndex(where: { $0.id == item }) {
-                appData.runViewItems[index].isVisible = true
-            }
-        }
-        dismiss()
-    }
-    
-    private func itemSelected(item: RunViewItem.ID) {
-        if selectedRows.contains(item) {
-            selectedRows.remove(item)
-        } else {
-            selectedRows.insert(item)
-        }
-        
-    }
-    
-    
 }
