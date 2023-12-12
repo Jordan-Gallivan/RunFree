@@ -9,7 +9,7 @@ import Foundation
 import SwiftData
 import SwiftUI
 
-struct PaceView: View, RunComponentProperties {
+struct PaceView: View {
     @EnvironmentObject private var appData: AppData
     
     // Query Settings Model.  Only one model in context, ensured at application initialization

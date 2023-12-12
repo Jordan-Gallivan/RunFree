@@ -9,7 +9,7 @@ import Foundation
 import SwiftUI
 
 /// Displays the elapsed Timer.
-struct RunningTimerView: View, RunComponentProperties {
+struct ElapsedTimerView: View {
     @EnvironmentObject private var appData: AppData
     
     // MARK: - RunComponentProperties

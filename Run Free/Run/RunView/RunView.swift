@@ -142,7 +142,7 @@ struct RunView: View {
         }
         .sheet(isPresented: $addRunComponents) {
             // add components not currently displayed
-            AddRunViewItems()
+            AddRunComponents()
                 .presentationDetents(
                     [PresentationDetent.fraction(CGFloat(0.25)), PresentationDetent.fraction(CGFloat(0.10))],
                     selection: $addRunComponentDetent

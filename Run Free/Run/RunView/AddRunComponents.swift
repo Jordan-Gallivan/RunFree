@@ -10,7 +10,7 @@ import SwiftData
 import SwiftUI
 
 /// Sheet to toggle visibility of components not currently displayed
-struct AddRunViewItems: View {
+struct AddRunComponents: View {
     @EnvironmentObject private var appData: AppData
     @Environment(\.modelContext) var dbContext
     @Query(sort: \RunComponentModel.position, order: .forward) var runComponents: [RunComponentModel]

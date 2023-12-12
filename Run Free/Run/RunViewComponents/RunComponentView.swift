@@ -34,7 +34,7 @@ struct RunComponentView: View, Identifiable, Hashable {
             Group {
                 switch runComponentType {
                 case .timer:
-                    RunningTimerView(name: name, componentSize: componentSize, componentColor: componentColor)
+                    ElapsedTimerView(name: name, componentSize: componentSize, componentColor: componentColor)
                 case .distance:
                     DistanceView(name: name, componentSize: componentSize, componentColor: componentColor)
                 case .pace:

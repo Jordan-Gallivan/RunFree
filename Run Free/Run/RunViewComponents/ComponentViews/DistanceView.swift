@@ -10,7 +10,7 @@ import SwiftData
 import SwiftUI
 
 /// Displays the elapsed distance.
-struct DistanceView: View, RunComponentProperties {
+struct DistanceView: View {
     @EnvironmentObject private var appData: AppData
     
     // Query Settings Model.  Only one model in context, ensured at application initialization
@@ -25,7 +25,7 @@ struct DistanceView: View, RunComponentProperties {
 
     var body: some View {
                 HStack {
-                    Text(String(format: "%.2f", appData.elapsedDistance(metric: settings.metric)))
+                    Text(String(format: "%.2f", appData.elapsedDistance(isMetric: settings.metric)))
                         .font(.system(size: componentSize))
                         .foregroundStyle(componentColor)
                     Text(settings.metric ? "km" : "mi")

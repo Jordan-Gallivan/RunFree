@@ -22,7 +22,7 @@ class AppData: NSObject, ObservableObject, CLLocationManagerDelegate {
     @Published var timerActive: Bool = false
     @Published var timerPaused: Bool = false
     
-    /* Heart Rate */
+    /// Heart Rate
     @Published var heartRate: Int = 0
     
     // MARK: - Elapsed Timer
@@ -34,8 +34,8 @@ class AppData: NSObject, ObservableObject, CLLocationManagerDelegate {
     private var prevLocation: CLLocation?
     private var currentLocation: CLLocation?
     private var elapsedDistanceInMeters: Double = 0
-    func elapsedDistance(metric: Bool) -> Double {
-        return metric ? self.elapsedDistanceInMeters / 1000.0 : self.elapsedDistanceInMeters / 1609.34
+    func elapsedDistance(isMetric: Bool) -> Double {
+        return isMetric ? self.elapsedDistanceInMeters / 1000.0 : self.elapsedDistanceInMeters / 1609.34
     }
     
     // MARK: - Pace

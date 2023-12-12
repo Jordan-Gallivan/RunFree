@@ -48,7 +48,6 @@ class PriorityQueue<T:Comparable>: Queue, Sequence {
     
     /// Returns the minimum element in the Heap if one exists.
     func peek() -> T? {
-        // TODO: Copy return element?
         if isEmpty {
             return nil
         }

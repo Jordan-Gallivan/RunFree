@@ -37,7 +37,7 @@
 		4C647C032B13D2BC005A1F6D /* WeatherConditionConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C647C022B13D2BC005A1F6D /* WeatherConditionConstants.swift */; };
 		4C647C052B13D7B9005A1F6D /* TimeOfDay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C647C042B13D7B9005A1F6D /* TimeOfDay.swift */; };
 		4C647C072B13E1E2005A1F6D /* PaceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C647C062B13E1E2005A1F6D /* PaceView.swift */; };
-		4C647C092B142E57005A1F6D /* AddRunViewItems.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C647C082B142E57005A1F6D /* AddRunViewItems.swift */; };
+		4C647C092B142E57005A1F6D /* AddRunComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C647C082B142E57005A1F6D /* AddRunComponents.swift */; };
 		4C647C0C2B153858005A1F6D /* DefaultButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C647C0B2B153858005A1F6D /* DefaultButton.swift */; };
 		4C647C0E2B158466005A1F6D /* SettingsButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C647C0D2B158466005A1F6D /* SettingsButton.swift */; };
 		4C647C102B1584DC005A1F6D /* RunButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C647C0F2B1584DC005A1F6D /* RunButton.swift */; };
@@ -56,14 +56,13 @@
 		4CA143102B1E5581005D21F8 /* RunComponentModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CA1430F2B1E5581005D21F8 /* RunComponentModel.swift */; };
 		4CA143142B1E56F6005D21F8 /* RunComponentType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CA143132B1E56F6005D21F8 /* RunComponentType.swift */; };
 		4CA143182B1E5978005D21F8 /* DefaultRunComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CA143172B1E5978005D21F8 /* DefaultRunComponents.swift */; };
-		4CA1431C2B1E68DF005D21F8 /* RunComponentProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CA1431B2B1E68DF005D21F8 /* RunComponentProperties.swift */; };
 		4CA1431E2B1F7B7C005D21F8 /* RunComponentSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CA1431D2B1F7B7C005D21F8 /* RunComponentSettingsView.swift */; };
 		4CA143202B2102C1005D21F8 /* SettingsModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CA1431F2B2102C1005D21F8 /* SettingsModel.swift */; };
 		4CADD3272AFD3DC600F52F50 /* HeartRateZones.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CADD3262AFD3DC600F52F50 /* HeartRateZones.swift */; };
 		4CADD3292AFD55B900F52F50 /* ApplicationData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CADD3282AFD55B900F52F50 /* ApplicationData.swift */; };
 		4CADD32B2AFD607F00F52F50 /* HeartRateLine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CADD32A2AFD607F00F52F50 /* HeartRateLine.swift */; };
 		4CBAF66D2B06F68D00E2F31F /* RunComponentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CBAF66C2B06F68D00E2F31F /* RunComponentView.swift */; };
-		4CBAF66F2B06FE8800E2F31F /* RunningTimerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CBAF66E2B06FE8800E2F31F /* RunningTimerView.swift */; };
+		4CBAF66F2B06FE8800E2F31F /* ElapsedTimerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CBAF66E2B06FE8800E2F31F /* ElapsedTimerView.swift */; };
 		4CBAF6712B07028400E2F31F /* DistanceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CBAF6702B07028400E2F31F /* DistanceView.swift */; };
 		4CBAF6732B0702CB00E2F31F /* HeartRateView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CBAF6722B0702CB00E2F31F /* HeartRateView.swift */; };
 		4CF2B38B2AF41E7C001E9B40 /* Taf.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CF2B38A2AF41E7C001E9B40 /* Taf.swift */; };
@@ -121,7 +120,7 @@
 		4C647C022B13D2BC005A1F6D /* WeatherConditionConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherConditionConstants.swift; sourceTree = "<group>"; };
 		4C647C042B13D7B9005A1F6D /* TimeOfDay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeOfDay.swift; sourceTree = "<group>"; };
 		4C647C062B13E1E2005A1F6D /* PaceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaceView.swift; sourceTree = "<group>"; };
-		4C647C082B142E57005A1F6D /* AddRunViewItems.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddRunViewItems.swift; sourceTree = "<group>"; };
+		4C647C082B142E57005A1F6D /* AddRunComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddRunComponents.swift; sourceTree = "<group>"; };
 		4C647C0B2B153858005A1F6D /* DefaultButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultButton.swift; sourceTree = "<group>"; };
 		4C647C0D2B158466005A1F6D /* SettingsButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsButton.swift; sourceTree = "<group>"; };
 		4C647C0F2B1584DC005A1F6D /* RunButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunButton.swift; sourceTree = "<group>"; };
@@ -140,14 +139,13 @@
 		4CA1430F2B1E5581005D21F8 /* RunComponentModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunComponentModel.swift; sourceTree = "<group>"; };
 		4CA143132B1E56F6005D21F8 /* RunComponentType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunComponentType.swift; sourceTree = "<group>"; };
 		4CA143172B1E5978005D21F8 /* DefaultRunComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultRunComponents.swift; sourceTree = "<group>"; };
-		4CA1431B2B1E68DF005D21F8 /* RunComponentProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunComponentProperties.swift; sourceTree = "<group>"; };
 		4CA1431D2B1F7B7C005D21F8 /* RunComponentSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunComponentSettingsView.swift; sourceTree = "<group>"; };
 		4CA1431F2B2102C1005D21F8 /* SettingsModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsModel.swift; sourceTree = "<group>"; };
 		4CADD3262AFD3DC600F52F50 /* HeartRateZones.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeartRateZones.swift; sourceTree = "<group>"; };
 		4CADD3282AFD55B900F52F50 /* ApplicationData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplicationData.swift; sourceTree = "<group>"; };
 		4CADD32A2AFD607F00F52F50 /* HeartRateLine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeartRateLine.swift; sourceTree = "<group>"; };
 		4CBAF66C2B06F68D00E2F31F /* RunComponentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunComponentView.swift; sourceTree = "<group>"; };
-		4CBAF66E2B06FE8800E2F31F /* RunningTimerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunningTimerView.swift; sourceTree = "<group>"; };
+		4CBAF66E2B06FE8800E2F31F /* ElapsedTimerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ElapsedTimerView.swift; sourceTree = "<group>"; };
 		4CBAF6702B07028400E2F31F /* DistanceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DistanceView.swift; sourceTree = "<group>"; };
 		4CBAF6722B0702CB00E2F31F /* HeartRateView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeartRateView.swift; sourceTree = "<group>"; };
 		4CF2B38A2AF41E7C001E9B40 /* Taf.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Taf.swift; sourceTree = "<group>"; };
@@ -437,7 +435,7 @@
 			isa = PBXGroup;
 			children = (
 				4C9CA6432AFC6CD4009F2D63 /* RunView.swift */,
-				4C647C082B142E57005A1F6D /* AddRunViewItems.swift */,
+				4C647C082B142E57005A1F6D /* AddRunComponents.swift */,
 			);
 			path = RunView;
 			sourceTree = "<group>";
@@ -445,11 +443,10 @@
 		4CA143152B1E5930005D21F8 /* ComponentViews */ = {
 			isa = PBXGroup;
 			children = (
-				4CBAF66E2B06FE8800E2F31F /* RunningTimerView.swift */,
+				4CBAF66E2B06FE8800E2F31F /* ElapsedTimerView.swift */,
 				4CBAF6702B07028400E2F31F /* DistanceView.swift */,
 				4CBAF6722B0702CB00E2F31F /* HeartRateView.swift */,
 				4C647C062B13E1E2005A1F6D /* PaceView.swift */,
-				4CA1431B2B1E68DF005D21F8 /* RunComponentProperties.swift */,
 				4CA1431D2B1F7B7C005D21F8 /* RunComponentSettingsView.swift */,
 				4C7FA54C2B23A63C007BBFCC /* ZoneView.swift */,
 			);
@@ -601,7 +598,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4CA1431C2B1E68DF005D21F8 /* RunComponentProperties.swift in Sources */,
 				4C647C012B13D270005A1F6D /* CloudConstants.swift in Sources */,
 				4CADD3272AFD3DC600F52F50 /* HeartRateZones.swift in Sources */,
 				4CA143142B1E56F6005D21F8 /* RunComponentType.swift in Sources */,
@@ -636,9 +632,9 @@
 				4C41EAC02B2241860091B37A /* WeatherImage.swift in Sources */,
 				4C647C202B16C774005A1F6D /* DeviceSearch.swift in Sources */,
 				4C295F4D2AE99AD5006F0872 /* WeatherLoadingView.swift in Sources */,
-				4CBAF66F2B06FE8800E2F31F /* RunningTimerView.swift in Sources */,
+				4CBAF66F2B06FE8800E2F31F /* ElapsedTimerView.swift in Sources */,
 				4C295F392AD8BD6D006F0872 /* Queue.swift in Sources */,
-				4C647C092B142E57005A1F6D /* AddRunViewItems.swift in Sources */,
+				4C647C092B142E57005A1F6D /* AddRunComponents.swift in Sources */,
 				4CF2B38B2AF41E7C001E9B40 /* Taf.swift in Sources */,
 				4C647C032B13D2BC005A1F6D /* WeatherConditionConstants.swift in Sources */,
 				4C295F342AD8BD6D006F0872 /* Metar.swift in Sources */,

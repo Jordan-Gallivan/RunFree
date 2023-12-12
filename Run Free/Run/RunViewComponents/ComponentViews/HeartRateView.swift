@@ -10,7 +10,7 @@ import SwiftData
 import SwiftUI
 
 /// Displays the current Heart Rate.
-struct HeartRateView: View, RunComponentProperties {
+struct HeartRateView: View {
     @EnvironmentObject private var appData: AppData
     @EnvironmentObject private var controller: PolarController
     
