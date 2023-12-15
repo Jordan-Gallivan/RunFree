@@ -17,78 +17,44 @@ enum WeatherParser {
     ///    - metar: True if weather line is from a METAR.
     ///
     /// - Returns: (weatherCondition, windDirection, windSpeed, clouds, temperature).  Note all return values are optional.
-    static func parseWeather(weather: [String], isMetar: Bool = false) -> ([WeatherCondition]?, String?, Int?, Clouds?, Int?) {
-        
-        var j = 0
+    static func parseWeather(weather: String) -> ParsedWeather {
+        // TODO: return a struct, remove metar argument
         var weatherCondition: [WeatherCondition]? = nil
         var windDirection: String? = nil
         var windSpeed: Int? = nil
         var clouds: Clouds? = nil
         var temperature: Int? = nil
         
-        // determine if wind is in string and update (string ends in "KT")
-        if weather[j].firstMatch(of: /KT$/) != nil {
-            (windDirection, windSpeed) = parseWind(wind: weather[j])
-            j += 1
-        }
-        // skip over variable wind
-        if weather[j].firstMatch(of: /\d{3}V\d{3}/) != nil {
-            j += 1
-        }
+        let weatherConditionMatches = weather.matches(of: WeatherParserRegEx.WEATHER_CONDITIONS).map { $0.1 }
+        let windMatches = weather.matches(of: WeatherParserRegEx.WIND).map { $0.1 }
+        let cloudMatches = weather.matches(of: WeatherParserRegEx.CLOUDS).map { $0.1 }
+        let temperatureMatches = weather.matches(of: WeatherParserRegEx.TEMPERATURE).map { $0.1 }
         
-        // skip over visibility (string is either 4 digits or ends in "SM")
-        while j < weather.count && (weather[j].firstMatch(of: /\d{4}/) != nil || weather[j].firstMatch(of: /SM$/) != nil || weather[j].count < 2) {
-            j += 1
+        // parse wind
+        if !windMatches.isEmpty {
+            (windDirection, windSpeed) = parseWind(wind: String(windMatches[0]))
         }
         
         // parse weather conditions
-        var k = j
-        while k < weather.count {
-            let entry = weather[k]
-            if SKY_CONDITIONS.contains(String(entry[..<entry.index(entry.startIndex, offsetBy:2)])) {
-                break
-            }
-            if entry.count > 2 && SKY_CONDITIONS.contains(String(entry[..<entry.index(entry.startIndex, offsetBy:3)])) {
-                break
-            }
-            k += 1
-        }
-        if k != j {
-            weatherCondition = parseWeatherCondition(weatherCondition: weather[j..<k].map {String($0)})
-        }
-        j = k
-        
-        // parse wind
-        while k < weather.count {
-            let entry = weather[k]
-            let firstTwo = SKY_CONDITIONS.contains(String(entry[..<entry.index(entry.startIndex, offsetBy:2)]))
-            let firstThree = entry.count > 2 && SKY_CONDITIONS.contains(String(entry[..<entry.index(entry.startIndex, offsetBy:3)]))
-            if !firstTwo && !firstThree {
-                break
-            }
-            k += 1
+        if !weatherConditionMatches.isEmpty {
+            weatherCondition = parseWeatherCondition(weatherCondition: weatherConditionMatches.map { String($0) })
         }
         
-        if k != j {
-            clouds = parseClouds(cloudConditions: weather[j..<k])
+        // parse clouds
+        if !cloudMatches.isEmpty {
+            clouds = parseClouds(cloudConditions: cloudMatches.map { String($0) })
         }
         
-        // parse temperature if a METAR
-        if isMetar {
-            while k < weather.count {
-                let entry = weather[k]
-                if entry.contains("/") {
-                    break
-                }
-                k += 1
-            }
-            
-            temperature = k < weather.count
-                            ? parseTemperature(temperatureString: weather[k])
-                            : nil
+        // parse temperature
+        if !temperatureMatches.isEmpty {
+            temperature = parseTemperature(temperatureString: String(temperatureMatches[0]))
         }
         
-        return (weatherCondition, windDirection, windSpeed, clouds, temperature)
+        return ParsedWeather(weatherCondition: weatherCondition,
+                             windDirection: windDirection,
+                             windSpeed: windSpeed,
+                             clouds: clouds,
+                             temperature: temperature)
     }
     
     /// Calculates the wind direction and speed.

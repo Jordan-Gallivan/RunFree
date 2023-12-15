@@ -29,6 +29,9 @@ struct ZoneView: View {
                 Text("No Zone Data Available")
             }
         }
+//        ProgressView("Zone",
+//                     value: settings.heartRateZones.calcFractionalHr(heartRate: 165 ?? 0))
+//        .progressViewStyle(ZoneProgressViewStyle())
     }
 }
 

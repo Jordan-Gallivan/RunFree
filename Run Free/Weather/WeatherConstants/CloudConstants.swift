@@ -114,7 +114,7 @@ enum Clouds: String, Comparable {
         case .SCT:
             if night {
                 return WeatherImage(image: Image(systemName: "cloud.moon").symbolRenderingMode(.palette),
-                                    lightModeColors: [.primary, .white, .primary],
+                                    lightModeColors: [.primary, .primary, .primary],
                                     darkModeColors: [.primary, .white, .primary]
                 )
             } else {

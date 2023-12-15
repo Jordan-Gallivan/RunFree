@@ -345,16 +345,16 @@ class Taf {
     ///
     private func updateForecastsFromIndicies(components comp: [String], startIndex: Int, endIndex: Int, probability: Int? = nil) {
         
-        let (precipitation, windDirection, windSpeed, clouds, _) = WeatherParser.parseWeather(weather: comp)
+        let parsedWeather = WeatherParser.parseWeather(weather: comp.joined(separator: " "))
         
         // update forecasts
         for k in startIndex..<endIndex {
             // only update if forecast line is NOT a sunrise/sunset time
             if !forecasts[k].sunrise && !forecasts[k].sunset {
-                forecasts[k].windDirection = windDirection ?? forecasts[k].windDirection
-                forecasts[k].windSpeed = windSpeed ?? forecasts[k].windSpeed
-                forecasts[k].weatherCondition = precipitation ?? forecasts[k].weatherCondition
-                forecasts[k].clouds = clouds ?? forecasts[k].clouds
+                forecasts[k].windDirection = parsedWeather.windDirection ?? forecasts[k].windDirection
+                forecasts[k].windSpeed = parsedWeather.windSpeed ?? forecasts[k].windSpeed
+                forecasts[k].weatherCondition = parsedWeather.weatherCondition ?? forecasts[k].weatherCondition
+                forecasts[k].clouds = parsedWeather.clouds ?? forecasts[k].clouds
                 forecasts[k].probability = probability ?? forecasts[k].probability
             }
         }

@@ -51,3 +51,6 @@ o priority queue
 o querying model
     moving items in the array.  position, deleting etc
     single query for settings
+    
+COMPONENT SIZE IS BEING ZERO'D OUT
+

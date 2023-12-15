@@ -64,19 +64,20 @@ class Metar {
             throw MetarError.runTimeError(message: "INVALID METAR")
         }
                 
-        let (weatherCondition, windDirection, windSpeed, clouds, temperature) = WeatherParser.parseWeather(
-            weather:Array(components[j..<components.count]),
-            isMetar: true)
+        let parsedWeather = WeatherParser.parseWeather(weather: metar)
         
-        guard let windDirection, let windSpeed, let clouds, let temperature else {
+        guard let windDirection = parsedWeather.windDirection,
+                let windSpeed = parsedWeather.windSpeed,
+                let clouds = parsedWeather.clouds,
+                let temperature = parsedWeather.temperature else {
             var errorMessage = "Error "
-            if windDirection == nil || windSpeed == nil {
+            if parsedWeather.windDirection == nil || parsedWeather.windSpeed == nil {
                 errorMessage += "parsing wind, "
             }
-            if clouds == nil {
+            if parsedWeather.clouds == nil {
                 errorMessage += "parsing clouds, "
             }
-            if temperature == nil {
+            if parsedWeather.temperature == nil {
                 errorMessage += "parsing temperature, "
             }
             errorMessage = String(errorMessage[errorMessage.startIndex..<errorMessage.index(errorMessage.endIndex, offsetBy: -2)])
@@ -84,7 +85,7 @@ class Metar {
             throw MetarError.runTimeError(message: errorMessage)
         }
         
-        self.precipitation = weatherCondition
+        self.precipitation = parsedWeather.weatherCondition
         self.windDirection = windDirection
         self.windSpeedKnots = windSpeed
         self.clouds = clouds
