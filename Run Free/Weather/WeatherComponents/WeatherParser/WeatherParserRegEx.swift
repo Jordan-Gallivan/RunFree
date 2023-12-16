@@ -19,6 +19,7 @@ extension ChoiceOf where RegexOutput == Substring {
 
 enum WeatherParserRegEx {
     static let WEATHER_CONDITIONS = Regex {
+        " "
         Capture {
             Optionally {
                 ChoiceOf {

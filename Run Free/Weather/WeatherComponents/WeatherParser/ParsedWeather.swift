@@ -7,6 +7,7 @@
 
 import Foundation
 
+/// Stores the individual weather components of a METAR or TAF line.
 struct ParsedWeather {
     let weatherCondition: [WeatherCondition]?
     let windDirection: String?

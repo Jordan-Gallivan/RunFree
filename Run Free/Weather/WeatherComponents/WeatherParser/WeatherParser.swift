@@ -16,9 +16,8 @@ enum WeatherParser {
     ///    - weather: Array of string values that make up the METAR or TAF line.
     ///    - metar: True if weather line is from a METAR.
     ///
-    /// - Returns: (weatherCondition, windDirection, windSpeed, clouds, temperature).  Note all return values are optional.
+    /// - Returns: a ParsedWeather Struct containing the parsed components of the weather line.
     static func parseWeather(weather: String) -> ParsedWeather {
-        // TODO: return a struct, remove metar argument
         var weatherCondition: [WeatherCondition]? = nil
         var windDirection: String? = nil
         var windSpeed: Int? = nil
@@ -126,6 +125,8 @@ enum WeatherParser {
             returnArray.append(currPrecip)
             
         }
+        
+        
         
         return returnArray
     }
