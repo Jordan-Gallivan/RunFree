@@ -112,9 +112,9 @@ User Settings are maintained in the `SettingsModel` within the Persistent Storag
   
 If the user has toggled useHeartRateZones to true, the are required to input their heart rate zone values in the provided `TextFields`.  When the user attempts to exit the settings page, thes values are validated.  Any failed validation is displayed to the user in an alert box with expounding information as to why the validation failed.  Users are given the option to correct the invalid zones, or toggle `useHeartRateZones` to false.
 
-// Settings View
-
-// Alert View
+|<img src="DesignDocImages/SettingsView.png" width="250">| <img src="DesignDocImages/SettingsHRExpanded.png" width="250"> | <img src="DesignDocImages/SettingsAlert.png" width="250">|
+|:--:|:--:|:--:|
+|Settings View | Settings View with Heart Rate Zones | Settings View Alert |
 
 # Persistent Storage
 All user settings and Run View customizations are stored via `RunComponentModels` and a single `SettingsModel` in the applications `modelContainer`.  This model container is accessed via model context and queries using the [SwiftData API](https://developer.apple.com/documentation/swiftdata).  
