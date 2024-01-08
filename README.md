@@ -98,11 +98,9 @@ The default Edit functionality of the `List` has been overridden to allow for up
 - **Customize the Components**: Users can modify the color, size, and title visibility of the component through the `.onTapGesture` modifier of the component. Doing so sets the `selectedRunComponent` to the component that was tapped, and this component is modified via a the `RunComponentSettingsView` which is displayed as a sheet at the bottom of the screen.  
 - **Add RunComponents**: Users can add components that have been deleted via a custom + button that is visible when edit mode is activated.  Doing so displays a sheet on the bottom of the screen the components that are currently “deleted.”  When the user taps on any of these components, they are added to the RunView by setting the isVisible attribute to true.
 
-// edit active
-
-// Customize components
-
-// Add Run Components
+|<img src="DesignDocImages/RunViewEdit.gif" width="250">|
+|:--:|
+|Editing the Run View|
 
 ## User Settings
 User Settings are maintained in the `SettingsModel` within the Persistent Storage of the application.  Users can toggle the following Boolean values:
