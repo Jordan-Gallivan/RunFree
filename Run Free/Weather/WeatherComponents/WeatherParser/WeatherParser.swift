@@ -141,8 +141,7 @@ enum WeatherParser {
         for cloudCondition in cloudConditions {
             var currCloud: Clouds
             
-            switch (cloudCondition[
-                cloudCondition.startIndex..<cloudCondition.index(cloudCondition.startIndex, offsetBy: 3)]) {
+            switch cloudCondition {
             case Clouds.OVC.rawValue:
                 currCloud = Clouds.OVC
             case Clouds.BKN.rawValue:

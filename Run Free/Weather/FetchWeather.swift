@@ -32,8 +32,8 @@ class FetchWeather: ObservableObject {
         self.result = .inProgress
         
         // TODO: update lat/long from user
-        let userLat = 37.75
-        let userLong = -99.95
+        let userLat = 30.1
+        let userLong = -91.75
                 
         do {
             // fetch sunrise/sunset

@@ -77,6 +77,8 @@ final class WeatherImageGenerator {
             default:
                 return [.primary, .cyan, .primary]
             }
+        case "sleet.custom":
+            return [.primary, .blue, .cyan]
         case "hail":
             return [.primary, .cyan, .primary]
         case "heavyrain":

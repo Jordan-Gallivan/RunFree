@@ -29,6 +29,7 @@ enum WeatherParserRegEx {
             }
             ChoiceOf(WeatherConditionConstants.WEATHER_CONDITION_DICTIONARY.keys)
         }
+        " "
     }
     
     static let WIND = Regex {

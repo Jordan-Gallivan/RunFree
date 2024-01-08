@@ -31,6 +31,7 @@ class Taf {
         timeFormat.timeZone = TimeZone(abbreviation: "UTC")
         timeFormat.dateFormat = "HHmm"
         let dateFormat = DateFormatter()
+        dateFormat.timeZone = TimeZone(abbreviation: "UTC")
         dateFormat.dateFormat = "dd"
         currentTime = Int(timeFormat.string(from: date))!
         currentDate = Int(dateFormat.string(from: date))!
@@ -296,7 +297,6 @@ class Taf {
             // index into array until forecasts[i].date == startDate and forecasts[i].time >= startTime
             while i < forecasts.count
                     && ((forecasts[i].date != startDate || forecasts[i].time < startTime) || (startDate == 1 && forecasts[i].date >= 28)) {
-                
                 i += 1
                 // TODO: Fix while conditional for end of the month...
             }
