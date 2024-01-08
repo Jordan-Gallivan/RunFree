@@ -85,7 +85,7 @@ enum Clouds: String, Comparable {
     func cloudString() -> String {
         switch self {
         case .OVC:
-            return "Overcast Skies"
+            return "Overcast"
         case .BKN:
             return "Cloudy"
         case .SCT:

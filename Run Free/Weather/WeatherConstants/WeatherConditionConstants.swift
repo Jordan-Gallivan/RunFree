@@ -41,7 +41,7 @@ enum WeatherConditionConstants {
         "SHGS": WeatherCondition("Small Hail Showers", "hail", .cloud),
         "FZDZ": WeatherCondition("Freezing Drizzle", "snow", .cloudOrSun),
         "FZRA": WeatherCondition("Freezing Rain", "sleet.custom", .cloud),
-        "FZFG": WeatherCondition("Freezing Drizzle", "fog", .cloud),
+        "FZFG": WeatherCondition("Freezing Fog", "fog", .cloud),
         "BR": WeatherCondition("Mist", "fog", .cloud),
         "FG": WeatherCondition("Fog", "fog", .cloud),
         "FU": WeatherCondition("Smoke", "fog", .cloud),

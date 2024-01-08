@@ -62,12 +62,10 @@ struct ForecastLine: View {
                     }
                 }
                 Spacer()
-            } else {
-                if let windIcon {
-                    windIcon
-                        .font(.title2)
-                    Spacer()
-                }
+            } else if let windIcon {
+                windIcon
+                    .font(.title2)
+                Spacer()
             }
             
             // Probability

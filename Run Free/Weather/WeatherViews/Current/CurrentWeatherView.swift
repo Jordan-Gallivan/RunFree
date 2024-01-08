@@ -62,12 +62,17 @@ struct CurrentWeatherView: View {
                     .foregroundStyle(weatherImage.lightModeColors[0], weatherImage.lightModeColors[1], weatherImage.lightModeColors[2])
             }
             VStack {
-                ForEach(weatherArray, id: \.self) { wx in
-                    Text(wx.description)
-                        .lineLimit(1)
-                        .scaledToFit()
-                        .minimumScaleFactor(0.5)
+                if weatherArray.count > 0 {
+                    ForEach(weatherArray, id: \.self) { wx in
+                        Text(wx.description)
+                            .lineLimit(1)
+                            .scaledToFit()
+                            .minimumScaleFactor(0.5)
+                    }
+                } else {
+                    Text(metar.clouds.cloudString())
                 }
+                
             }
         }
     }

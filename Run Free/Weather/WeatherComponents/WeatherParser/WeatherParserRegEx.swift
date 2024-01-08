@@ -19,7 +19,7 @@ extension ChoiceOf where RegexOutput == Substring {
 
 enum WeatherParserRegEx {
     static let WEATHER_CONDITIONS = Regex {
-        " "
+        Anchor.wordBoundary
         Capture {
             Optionally {
                 ChoiceOf {
@@ -29,7 +29,7 @@ enum WeatherParserRegEx {
             }
             ChoiceOf(WeatherConditionConstants.WEATHER_CONDITION_DICTIONARY.keys)
         }
-        " "
+        Anchor.wordBoundary
     }
     
     static let WIND = Regex {
