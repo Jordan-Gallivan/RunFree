@@ -9,7 +9,7 @@ Most off-the-shelf running applications still require at least one additional in
 This project began as an exploration of Swift, specific to iOS development, and evolved into a fully functional application that is free to use.  
 
 # Design
-This application follows the Swift and SwiftUI functional programming paradigms.  The application is broken into three primary components: Weather, Run, and Settings.  Additional groups are utilized for larger sub-components such as Heart Rate, the Persistent Storage Models, and Auxiliary Namespaces.  
+This application follows the Swift and SwiftUI Object Oriented programming paradigms.  The application is broken into three primary components: Weather, Run, and Settings.  Additional groups are utilized for larger sub-components such as Heart Rate, the Persistent Storage Models, and Auxiliary Namespaces.  
 
 ## Weather
 The decision to utilize aviation weather is predicated on the fact that it is highly accurate and requires simple string parsing.  At first glance, the nomenclature is not intuitive, but the formatting is rigid and decipherable with the considerable external resources available.  Aviation weather is available in two forms, [METARs](https://en.wikipedia.org/wiki/METAR) which reflect the current weather, and [TAFs](https://en.wikipedia.org/wiki/Terminal_aerodrome_forecast) which reflect the forecasted weather.  These are either observed or automated at airports, referred extensively throughout at “stations.”  
@@ -98,11 +98,9 @@ The default Edit functionality of the `List` has been overridden to allow for up
 - **Customize the Components**: Users can modify the color, size, and title visibility of the component through the `.onTapGesture` modifier of the component. Doing so sets the `selectedRunComponent` to the component that was tapped, and this component is modified via a the `RunComponentSettingsView` which is displayed as a sheet at the bottom of the screen.  
 - **Add RunComponents**: Users can add components that have been deleted via a custom + button that is visible when edit mode is activated.  Doing so displays a sheet on the bottom of the screen the components that are currently “deleted.”  When the user taps on any of these components, they are added to the RunView by setting the isVisible attribute to true.
 
-// edit active
-
-// Customize components
-
-// Add Run Components
+|<img src="DesignDocImages/RunViewEdit.gif" width="250">|
+|:--:|
+|Editing the Run View|
 
 ## User Settings
 User Settings are maintained in the `SettingsModel` within the Persistent Storage of the application.  Users can toggle the following Boolean values:
@@ -129,6 +127,18 @@ Each component view described in the Run View section above is identified by a `
 
 # Error Handling
 # Testing
+## Unit Testing
+All unit tests were written utilizing the [XCTest framework](https://developer.apple.com/documentation/xctest).
+### WeatherParser
+The primary functions for parsing of METAR and TAF strings are declared private in accordance with best practices for API development. Swift does not allow access to protected access functions for testing purposes (re: Java and Mockito Testing framework) and therefore, the functions are not individually testable but the resulting structs created by `WeatherParser.parseWeather(weather:)` can easily be tested for validity.  As `WeatherParser` relies heavily on RegEx string matching, each of the below unit tests validate that the approrpriate strings are found and returned by `WeatherParser.parseWeather(weather:)`
+- `testGoodWeatherConditionStrings()` validates all weather conditions can be found and parsed within a weather string
+- `testBadWeatherConditionStrings()` validates weather conditions with spelling errors are not parsed within a weather string
+- `testHeavyWeatherConditionStrings()` validates the "+" modifier appended to the front of each weather string results in the key word "Heavy" being appended onto the weather conditions resultant string
+- `testLightWeatherConditionStrings()` validates the "-" modifier appended to the front of each weather string results in the key word "Light" being appended onto the weather conditions resultant string
+- `testWindDirections()` validates all portions of the compass produce the appropriate wind direction.  Additional weather strings of "VRB", the gusting modifier, and the no wind string "/////KT" are validated.
+- `testBadWindString()` validates 4-digit wind strings, strings that do not terminate in "KT", non-continuous 4-digit strings, and no wind strings return nil
+- `testPredominantCloudCondition()` validates the correct prevailing cloud conditions are in accordance with the inequality: OVC > BKN > SCT > FEW > SKC
+- `testBadClouds()` validates spelling errors in the cloud conditions return nil
 
 # Appendix
 ## A. Priority Queue
