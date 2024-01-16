@@ -126,8 +126,6 @@ enum WeatherParser {
             
         }
         
-        
-        
         return returnArray
     }
     

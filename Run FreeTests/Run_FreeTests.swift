@@ -77,7 +77,7 @@ final class Run_FreeTests: XCTestCase {
             WeatherCondition("Small Hail Showers", "hail", .cloud),
             WeatherCondition("Freezing Drizzle", "snow", .cloudOrSun),
             WeatherCondition("Freezing Rain", "rain", .cloudAndSun),
-            WeatherCondition("Freezing Drizzle", "fog", .cloud),
+            WeatherCondition("Freezing Fog", "fog", .cloud),
             WeatherCondition("Mist", "fog", .cloud),
             WeatherCondition("Fog", "fog", .cloud),
             WeatherCondition("Smoke", "fog", .cloud),
@@ -106,7 +106,7 @@ final class Run_FreeTests: XCTestCase {
         
         let testParsedWeather = WeatherParser.parseWeather(weather: badWeatherString)
         
-        XCTAssertEqual(testParsedWeather.weatherCondition, nil)
+        XCTAssertNil(testParsedWeather.weatherCondition)
     }
     
     func testHeavyWeatherConditionStrings() throws {
@@ -137,7 +137,7 @@ final class Run_FreeTests: XCTestCase {
             WeatherCondition("Heavy Small Hail Showers", "hail", .cloud),
             WeatherCondition("Heavy Freezing Drizzle", "snow", .cloudOrSun),
             WeatherCondition("Heavy Freezing Rain", "rain", .cloudAndSun),
-            WeatherCondition("Heavy Freezing Drizzle", "fog", .cloud),
+            WeatherCondition("Heavy Freezing Fog", "fog", .cloud),
             WeatherCondition("Heavy Mist", "fog", .cloud),
             WeatherCondition("Heavy Fog", "fog", .cloud),
             WeatherCondition("Heavy Smoke", "fog", .cloud),
@@ -189,7 +189,7 @@ final class Run_FreeTests: XCTestCase {
             WeatherCondition("Light Small Hail Showers", "hail", .cloud),
             WeatherCondition("Light Freezing Drizzle", "snow", .cloudOrSun),
             WeatherCondition("Light Freezing Rain", "rain", .cloudAndSun),
-            WeatherCondition("Light Freezing Drizzle", "fog", .cloud),
+            WeatherCondition("Light Freezing Fog", "fog", .cloud),
             WeatherCondition("Light Mist", "fog", .cloud),
             WeatherCondition("Light Fog", "fog", .cloud),
             WeatherCondition("Light Smoke", "fog", .cloud),
@@ -268,8 +268,85 @@ final class Run_FreeTests: XCTestCase {
         }
     }
     
-    // TODO: cap wind at 360? throw error or just return nil?
-    // TODO: 
+    func testBadWindString() throws {
+        let badWindStrings = [
+            "K19S 141535Z AUTO 00013K 2 1/2SM -SN BR OVC003 01/ A3045 RMK AO2 P0002 T0014////",
+            "K19S 141535Z AUTO 00a013KT 2 1/2SM -SN BR OVC003 01/ A3045 RMK AO2 P0002 T0014////",
+            "K19S 141535Z AUTO 0001KT 2 1/2SM -SN BR OVC003 01/ A3045 RMK AO2 P0002 T0014////",
+            "K19S 141535Z AUTO 2 1/2SM -SN BR OVC003 01/ A3045 RMK AO2 P0002 T0014////",
+        ]
+        for str in badWindStrings {
+            let parsedWeather = WeatherParser.parseWeather(weather: str)
+            XCTAssertNil(parsedWeather.windDirection)
+            XCTAssertNil(parsedWeather.windSpeed)
+        }
+    }
+    
+    func testPredominantCloudCondition() throws {
+        let cloudStrings = [
+            "KDDC 141533Z AUTO 14010KT 2 1/2SM RA BR SKC 02/02 A3049 RMK AO2 P0011 T00220017",
+            "KDDC 141533Z AUTO 14010KT 2 1/2SM RA BR FEW001 02/02 A3049 RMK AO2 P0011 T00220017",
+            "KDDC 141533Z AUTO 14010KT 2 1/2SM RA BR SCT002 02/02 A3049 RMK AO2 P0011 T00220017",
+            "KDDC 141533Z AUTO 14010KT 2 1/2SM RA BR BKN003 02/02 A3049 RMK AO2 P0011 T00220017",
+            "KDDC 141533Z AUTO 14010KT 2 1/2SM RA BR OVC004 02/02 A3049 RMK AO2 P0011 T00220017",
+            "KDDC 141533Z AUTO 14010KT 2 1/2SM RA BR SKC FEW001 SCT002 BKN003 OVC004 02/02 A3049 RMK AO2 P0011 T00220017",
+            "KDDC 141533Z AUTO 14010KT 2 1/2SM RA BR SKC FEW001 02/02 A3049 RMK AO2 P0011 T00220017",
+            "KDDC 141533Z AUTO 14010KT 2 1/2SM RA BR SKC SCT002 02/02 A3049 RMK AO2 P0011 T00220017",
+            "KDDC 141533Z AUTO 14010KT 2 1/2SM RA BR SKC BKN003 02/02 A3049 RMK AO2 P0011 T00220017",
+            "KDDC 141533Z AUTO 14010KT 2 1/2SM RA BR SKC OVC004 02/02 A3049 RMK AO2 P0011 T00220017",
+            "KDDC 141533Z AUTO 14010KT 2 1/2SM RA BR FEW001 SCT002 02/02 A3049 RMK AO2 P0011 T00220017",
+            "KDDC 141533Z AUTO 14010KT 2 1/2SM RA BR FEW001 BKN003 02/02 A3049 RMK AO2 P0011 T00220017",
+            "KDDC 141533Z AUTO 14010KT 2 1/2SM RA BR FEW001 OVC004 02/02 A3049 RMK AO2 P0011 T00220017",
+            "KDDC 141533Z AUTO 14010KT 2 1/2SM RA BR SCT002 BKN003 02/02 A3049 RMK AO2 P0011 T00220017",
+            "KDDC 141533Z AUTO 14010KT 2 1/2SM RA BR SCT002 OVC004 02/02 A3049 RMK AO2 P0011 T00220017",
+            "KDDC 141533Z AUTO 14010KT 2 1/2SM RA BR BKN003 OVC004 02/02 A3049 RMK AO2 P0011 T00220017",
+            "KDDC 141533Z AUTO 14010KT 2 1/2SM RA BR CB010 02/02 A3049 RMK AO2 P0011 T00220017",
+        ]
+        let goodCloudConditions: [Clouds] = [
+            .SKC,
+            .FEW,
+            .SCT,
+            .BKN,
+            .OVC,
+            .OVC,
+            .FEW,
+            .SCT,
+            .BKN,
+            .OVC,
+            .SCT,
+            .BKN,
+            .OVC,
+            .BKN,
+            .OVC,
+            .OVC,
+            .SKC,
+        ]
+        for (i, str) in cloudStrings.enumerated() {
+            let parsedWeather = WeatherParser.parseWeather(weather: str)
+            let cloud = try XCTUnwrap(parsedWeather.clouds)
+            XCTAssertEqual(cloud, goodCloudConditions[i])
+        }
+    }
+    
+    func testBadClouds() throws {
+        let badCloudString = [
+            "KDDC 141533Z AUTO 14010KT 2 1/2SM RA BR 02/02 A3049 RMK AO2 P0011 T00220017",
+            "KDDC 141533Z AUTO 14010KT 2 1/2SM RA BR SCK100 02/02 A3049 RMK AO2 P0011 T00220017",
+            "KDDC 141533Z AUTO 14010KT 2 1/2SM RA BR SK100 02/02 A3049 RMK AO2 P0011 T00220017",
+            "KDDC 141533Z AUTO 14010KT 2 1/2SM RA BR SC100 02/02 A3049 RMK AO2 P0011 T00220017",
+            "KDDC 141533Z AUTO 14010KT 2 1/2SM RA BR FE100 02/02 A3049 RMK AO2 P0011 T00220017",
+            "KDDC 141533Z AUTO 14010KT 2 1/2SM RA BR BK100 02/02 A3049 RMK AO2 P0011 T00220017",
+            "KDDC 141533Z AUTO 14010KT 2 1/2SM RA BR OV100 02/02 A3049 RMK AO2 P0011 T00220017",
+            "KDDC 141533Z AUTO 14010KT 2 1/2SM RA BR BC100 02/02 A3049 RMK AO2 P0011 T00220017",
+        ]
+        for str in badCloudString {
+            let parsedWeather = WeatherParser.parseWeather(weather: str)
+            XCTAssertNil(parsedWeather.clouds)
+        }
+    }
+    
+   // TODO: temp good
+    // TODO: temp bad
     
     
 
